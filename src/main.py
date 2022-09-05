@@ -3,7 +3,7 @@ from pycountry import countries  # type: ignore
 from pydantic import BaseModel
 
 import src.view.models as view_models
-from src.logic.holiday import get_holiday_name, get_supported_countries, is_holiday
+from src.logic.holiday import HolidayEngine
 
 
 class NotImplementedResponse(BaseModel):
@@ -11,6 +11,7 @@ class NotImplementedResponse(BaseModel):
 
 
 app = FastAPI(title="Forget Me Nots")
+holiday_engine: HolidayEngine = HolidayEngine()
 
 
 @app.post(
@@ -20,8 +21,12 @@ app = FastAPI(title="Forget Me Nots")
 )
 def is_it_a_holiday(payload: view_models.HolidayBasePayload):
     return view_models.IsHolidayResponse(
-        is_holiday=is_holiday(payload.country_abbreviation, payload.date),
-        holiday_name=get_holiday_name(payload.country_abbreviation, payload.date),
+        is_holiday=holiday_engine.is_holiday(
+            payload.country_abbreviation, payload.date
+        ),
+        holiday_name=holiday_engine.get_holiday_name(
+            payload.country_abbreviation, payload.date
+        ),
     )
 
 
@@ -31,5 +36,5 @@ def supported_countries():
         view_models.CountryResponse(
             abbreviation=country.alpha_2, name=country.name, flag=country.flag
         )
-        for country in get_supported_countries()
+        for country in holiday_engine.get_supported_countries()
     ]
