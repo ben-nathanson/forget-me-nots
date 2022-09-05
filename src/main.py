@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from pycountry import countries  # type: ignore
 from pydantic import BaseModel
 
 import src.view.models as view_models
