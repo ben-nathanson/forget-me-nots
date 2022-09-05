@@ -25,3 +25,9 @@ repos:
   hooks:
       - id: mypy
         args: [--ignore-missing-imports]
+
+- repo: https://github.com/hadialqattan/pycln
+  rev: v2.1.1
+  hooks:
+    - id: pycln
+      args: [--all=true]
