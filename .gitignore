@@ -18,3 +18,9 @@ __pycache__/
 
 # pytest caches
 .pytest_cache
+
+# coverage artifacts
+.coverage
+coverage.xml
+coverage.json
+htmlcov
