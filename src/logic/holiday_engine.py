@@ -39,3 +39,6 @@ class HolidayEngine:
         country_holidays = self._get_cached_country_holidays(country_code)
         _is_holiday: bool = date in country_holidays
         return _is_holiday
+
+
+print(holidays.list_supported_countries())
