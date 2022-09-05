@@ -1,5 +1,3 @@
-from datetime import date
-
 from fastapi import FastAPI
 from pycountry import countries  # type: ignore
 from pydantic import BaseModel

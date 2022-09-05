@@ -1,6 +1,5 @@
 import datetime as dt
 from http import HTTPStatus
-from typing import Optional
 
 import humps  # noqa, PyCharm confuses pyhumps and humps packages
 import pycountry
