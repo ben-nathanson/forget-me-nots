@@ -3,7 +3,7 @@ from pycountry import countries  # type: ignore
 from pydantic import BaseModel
 
 import src.view.models as view_models
-from src.logic.holiday import HolidayEngine
+from src.logic.holiday_engine import HolidayEngine
 
 
 class NotImplementedResponse(BaseModel):
