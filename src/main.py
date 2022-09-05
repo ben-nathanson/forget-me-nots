@@ -3,7 +3,7 @@ from pycountry import countries  # type: ignore
 from pydantic import BaseModel
 
 import src.view.models as view_models
-from src.logic.holiday_engine import HolidayEngine
+from src.logic import holiday_engine
 
 
 class NotImplementedResponse(BaseModel):
@@ -11,7 +11,6 @@ class NotImplementedResponse(BaseModel):
 
 
 app = FastAPI(title="Forget Me Nots")
-holiday_engine: HolidayEngine = HolidayEngine()
 
 
 @app.post(
