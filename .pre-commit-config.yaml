@@ -30,4 +30,4 @@ repos:
   rev: v2.1.1
   hooks:
     - id: pycln
-      args: [--all=true]
+      args: [--all]
