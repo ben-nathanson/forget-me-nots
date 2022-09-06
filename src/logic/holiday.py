@@ -1,8 +1,10 @@
 import datetime as dt
-from typing import Optional
+from typing import Optional, Union
 
 import holidays
 import pycountry  # noqa, Pycharm is confused
+
+holiday_date = Union[dt.date, str]
 
 
 class HolidayEngine:
@@ -24,7 +26,7 @@ class HolidayEngine:
 
         return cached_holidays
 
-    def get_holiday_name(self, country_code: str, date: dt.date) -> str:
+    def get_holiday_name(self, country_code: str, date: holiday_date) -> str:
         country_holidays = self._get_cached_country_holidays(country_code)
         return country_holidays.get(date) if date in country_holidays else ""
 
@@ -35,7 +37,7 @@ class HolidayEngine:
         ]
         return supported_countries
 
-    def is_holiday(self, country_code: str, date: dt.date) -> bool:
+    def is_holiday(self, country_code: str, date: holiday_date) -> bool:
         country_holidays = self._get_cached_country_holidays(country_code)
         _is_holiday: bool = date in country_holidays
         return _is_holiday
