@@ -21,7 +21,7 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
       - name: Test and Generate Coverage Report
         run: |
-           python3 -m coverage run -m pytest test;
+           python3 -m coverage run -m pytest;
            coverage xml;
       - name: Code Coverage Report
         uses: irongut/CodeCoverageSummary@v1.3.0
