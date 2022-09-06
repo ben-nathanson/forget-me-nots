@@ -1,3 +1,7 @@
+import datetime as dt
+
+import pytest
+
 from src.logic import holiday_engine
 
 
@@ -31,5 +35,10 @@ def test_cached_supported_countries_included_expected_countries():
     assert {"GB", "MX", "US"}.intersection(set(cached_countries))
 
 
-def test_is_holiday_returns_expected_response():
-    ...
+@pytest.mark.parametrize(
+    "date,expected_result",
+    [("2022-07-03", False), ("2022-07-04", True), ("2022-07-05", False)],
+)
+def test_is_holiday_returns_expected_response(date: dt.date, expected_result: bool):
+    holiday_decision: bool = holiday_engine.is_holiday("US", date)
+    assert holiday_decision == expected_result
