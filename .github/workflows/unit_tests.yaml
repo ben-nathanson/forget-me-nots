@@ -50,6 +50,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
+          body-includes: Summary
 
       - name: Create or Update Coverage PR Comment
         uses: peter-evans/create-or-update-comment@v2
