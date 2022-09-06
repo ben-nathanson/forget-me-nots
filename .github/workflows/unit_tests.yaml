@@ -14,6 +14,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+# Credit for this goes to https://til.simonwillison.net/pytest/pytest-code-coverage
       - name: Generate coverage report
         run: |
           pip install pytest-cov
