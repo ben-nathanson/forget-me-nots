@@ -47,7 +47,6 @@ jobs:
       - name: Add Coverage PR Comment
         uses: peter-evans/create-or-update-comment@v2
         with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          issue-number: ${{ github.event.pull_request.number }}
+          issue-number: 1
           body: ${{ steps.get-comment-body.outputs.body }}
           edit-mode: replace
