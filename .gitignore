@@ -1,8 +1,27 @@
+# Mac OS Filesystem
 **/.DS_STORE
 .DS_STORE
+
+# PyCharm
 .idea
+
+# virtual environments
 venv
 env
+
+# mypy caches
 .mypy_cache
+
+# python caches and compiled bytecode
 __pycache__/
 *.py[cod]
+
+# pytest caches
+.pytest_cache
+
+# coverage artifacts
+.coverage
+coverage.xml
+coverage.json
+htmlcov
+pytest.xml
