@@ -44,18 +44,19 @@ jobs:
           body="${body//$'\r'/'%0D'}"
           echo "::set-output name=body::$body"
 
-      - name: Find Comment
-        uses: peter-evans/find-comment@v2
-        id: fc
-        with:
-          issue-number: ${{ github.event.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: Summary
+#      - name: Find Comment
+#        uses: peter-evans/find-comment@v2
+#        id: fc
+#        with:
+#          issue-number: ${{ github.event.pull_request.number }}
+#          comment-author: 'github-actions[bot]'
+#          body-includes: Summary
 
       - name: Create or Update Coverage PR Comment
         uses: peter-evans/create-or-update-comment@v2
         with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
+#          comment-id: ${{ steps.fc.outputs.comment-id }}
+          comment-author: 'github-actions[bot]'
           issue-number: ${{ github.event.pull_request.number }}
           body: ${{ steps.get-comment-body.outputs.body }}
           edit-mode: replace
