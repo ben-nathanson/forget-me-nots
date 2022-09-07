@@ -122,3 +122,7 @@ class CountryResponse(ViewModel):
 
 class SupportedCountriesResponse(ViewModel):
     countries: list[CountryResponse]
+
+
+class NotImplementedResponse(BaseModel):
+    message: str = "Not implemented"
