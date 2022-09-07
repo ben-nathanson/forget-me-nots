@@ -28,9 +28,12 @@ class HolidayEngine:
             # Need to either update the CountryAbbreviation model to prevent this from
             # getting past the route handler
             country_holidays = holidays.country_holidays(country_code)
-            # This get() primes holidays to actually fetch its list of holidays
-            # Choice of date here is arbitrary.
-            country_holidays.get("01-01-2022")
+            # primes holidays to actually fetch its list of holidays
+            current_year: int = dt.date.today().year
+            one_hundred_years_ago: int = current_year - 100
+            one_hundred_years_from_now: int = current_year + 100
+            for year in range(one_hundred_years_ago, one_hundred_years_from_now):
+                country_holidays.get(f"01-01-{str(year)}")
             self._country_holidays_cache[country_code] = country_holidays
             return country_holidays
 
