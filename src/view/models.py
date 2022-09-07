@@ -67,7 +67,7 @@ class Date(dt.date):
                     HTTPStatus.UNPROCESSABLE_ENTITY,
                     detail=f"Unrecognized date format, expected {DATE_FORMAT}.",
                 )
-        return v
+        return dt.date(v.year, v.month, v.day)
 
 
 class UpcomingHolidaysPayload(ViewModel):
