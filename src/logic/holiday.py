@@ -1,12 +1,10 @@
 import datetime as dt
-from typing import Optional, Union
+from typing import Optional
 
 import holidays
 import pycountry  # noqa, Pycharm is confused
 
 import src.logic.models as logic_models
-
-holiday_date = Union[dt.date, str]
 
 
 class HolidayEngine:
@@ -28,7 +26,7 @@ class HolidayEngine:
 
         return cached_holidays
 
-    def get_holiday_name(self, country_code: str, date: holiday_date) -> str:
+    def get_holiday_name(self, country_code: str, date: dt.date) -> str:
         country_holidays = self._get_cached_country_holidays(country_code)
         return country_holidays.get(date) if date in country_holidays else ""
 
@@ -40,11 +38,11 @@ class HolidayEngine:
         return supported_countries
 
     def get_upcoming_holidays(
-        self, country_code: str, start: holiday_date, end: holiday_date
+        self, country_code: str, start: dt.date, end: dt.date
     ) -> list[logic_models.Holiday]:
         return []
 
-    def is_holiday(self, country_code: str, date: holiday_date) -> bool:
+    def is_holiday(self, country_code: str, date: dt.date) -> bool:
         country_holidays = self._get_cached_country_holidays(country_code)
         _is_holiday: bool = date in country_holidays
         return _is_holiday

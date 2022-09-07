@@ -6,6 +6,8 @@ import pycountry
 from fastapi import HTTPException
 from pydantic import BaseModel
 
+DATE_FORMAT: str = "%d-%m-%Y"  # day-month-year, e.g. 05-09-2022
+
 
 def _convert_to_camel_case(string: str) -> str:
     return humps.camelize(string)  # type: ignore
@@ -44,27 +46,57 @@ class CountryAbbreviation(str):
         return v
 
 
+class Date(dt.date):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if (
+            not isinstance(v, str)
+            or isinstance(v, dt.date)
+            or isinstance(v, dt.datetime)
+        ):
+            raise HTTPException(
+                HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=f"Unrecognized date format, expected {DATE_FORMAT}.",
+            )
+
+        if isinstance(v, str):
+            try:
+                v = dt.datetime.strptime(v, DATE_FORMAT)
+            except ValueError as e:
+                raise HTTPException(
+                    HTTPStatus.UNPROCESSABLE_ENTITY,
+                    detail=f"Unrecognized date format, expected {DATE_FORMAT}.",
+                )
+        return v
+
+
 class UpcomingHolidaysPayload(ViewModel):
     country_abbreviation: CountryAbbreviation
-    start_date: dt.date = dt.date.today()
-    end_date: dt.date = dt.date.today() + dt.timedelta(weeks=26)
+    start_date: Date = dt.date.today()  # type: ignore
+    end_date: Date = dt.date.today() + dt.timedelta(weeks=26)  # type: ignore
 
     class Config:
         schema_extra = {
             "example": {
                 "countryAbbreviation": "US",
-                "startDate": dt.date.today(),
-                "endDate": dt.date.today() + dt.timedelta(weeks=26),
+                "startDate": dt.date.today().strftime(DATE_FORMAT),
+                "endDate": (dt.date.today() + dt.timedelta(weeks=26)).strftime(
+                    DATE_FORMAT
+                ),
             }
         }
 
 
 class HolidayBasePayload(ViewModel):
     country_abbreviation: CountryAbbreviation
-    date: dt.date = dt.date.today()
+    date: Date = dt.date.today()  # type: ignore
 
     class Config:
-        schema_extra = {"example": {"date": "2022-09-05", "countryAbbreviation": "US"}}
+        schema_extra = {"example": {"date": "05-09-2022", "countryAbbreviation": "US"}}
 
 
 class IsHolidayResponse(ViewModel):
@@ -77,7 +109,7 @@ class IsHolidayResponse(ViewModel):
 
 class Holiday(ViewModel):
     holiday_name: str
-    date: dt.date
+    date: Date
     country_abbreviation: CountryAbbreviation
 
 
