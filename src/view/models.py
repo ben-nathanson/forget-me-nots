@@ -25,7 +25,10 @@ class CountryAbbreviation(str):
     @classmethod
     def validate(cls, v):
         if not isinstance(v, str):
-            raise TypeError("String required")
+            raise HTTPException(
+                HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=f"Country abbreviation should be a string.",
+            )
 
         if len(v) > 2:
             raise HTTPException(
