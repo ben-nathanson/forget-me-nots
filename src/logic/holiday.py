@@ -43,6 +43,7 @@ class HolidayEngine:
         country_holidays = self._get_cached_country_holidays(country_code)
         return country_holidays.get(date) if date in country_holidays else ""
 
+    # TODO define a custom model or find a way to get a better type hint from pycountry
     def get_supported_countries(self) -> list:
         supported_countries = [
             pycountry.countries.get(alpha_2=abbreviation)
