@@ -53,11 +53,7 @@ class Date(dt.date):
 
     @classmethod
     def validate(cls, v):
-        if (
-            not isinstance(v, str)
-            or isinstance(v, dt.date)
-            or isinstance(v, dt.datetime)
-        ):
+        if not isinstance(v, (str, dt.date, dt.datetime)):
             raise HTTPException(
                 HTTPStatus.UNPROCESSABLE_ENTITY,
                 detail=f"Unrecognized date format, expected {DATE_FORMAT}.",
