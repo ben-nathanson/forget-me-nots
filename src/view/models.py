@@ -4,7 +4,7 @@ from http import HTTPStatus
 import humps  # noqa, PyCharm confuses pyhumps and humps packages
 import pycountry
 from fastapi import HTTPException
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
 
 
 def _convert_to_camel_case(string: str) -> str:
@@ -17,18 +17,33 @@ class ViewModel(BaseModel):
         allow_population_by_field_name = True
 
 
-class HolidayBasePayload(ViewModel):
-    country_abbreviation: str
-    date: dt.date = dt.date.today()
+class CountryAbbreviation(str):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
 
-    @validator("country_abbreviation", pre=True)
-    def must_be_supported(cls, v):
+    @classmethod
+    def validate(cls, v):
+        if not isinstance(v, str):
+            raise TypeError("String required")
+
+        if len(v) > 2:
+            raise HTTPException(
+                HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail=f"Country abbreviation should be no more than two characters.",
+            )
+
         country = pycountry.countries.get(alpha_2=v)
         if country is None:
             raise HTTPException(
                 HTTPStatus.NOT_IMPLEMENTED, detail=f"'{v}' has not been implemented."
             )
         return v
+
+
+class HolidayBasePayload(ViewModel):
+    country_abbreviation: CountryAbbreviation
+    date: dt.date = dt.date.today()
 
     class Config:
         schema_extra = {"example": {"date": "2022-09-05", "countryAbbreviation": "US"}}
@@ -43,7 +58,7 @@ class IsHolidayResponse(ViewModel):
 
 
 class CountryResponse(ViewModel):
-    abbreviation: str
+    country_abbreviation: CountryAbbreviation
     name: str
     flag: str
 
