@@ -44,6 +44,21 @@ class CountryAbbreviation(str):
         return v
 
 
+class UpcomingHolidaysPayload(ViewModel):
+    country_abbreviation: CountryAbbreviation
+    start_date: dt.date = dt.date.today()
+    end_date: dt.date = dt.date.today() + dt.timedelta(weeks=26)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "countryAbbreviation": "US",
+                "startDate": dt.date.today(),
+                "endDate": dt.date.today() + dt.timedelta(weeks=26),
+            }
+        }
+
+
 class HolidayBasePayload(ViewModel):
     country_abbreviation: CountryAbbreviation
     date: dt.date = dt.date.today()
@@ -58,6 +73,12 @@ class IsHolidayResponse(ViewModel):
 
     class Config:
         schema_extra = {"example": {"holidayName": "Labor Day", "isHoliday": True}}
+
+
+class Holiday(ViewModel):
+    holiday_name: str
+    date: dt.date
+    country_abbreviation: CountryAbbreviation
 
 
 class CountryResponse(ViewModel):

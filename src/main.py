@@ -36,3 +36,21 @@ def supported_countries():
         )
         for country in holiday_engine.get_supported_countries()
     ]
+
+
+@app.post(
+    "/upcoming-holidays",
+    response_model=list[view_models.Holiday],
+    responses={501: {"model": NotImplementedResponse}},
+)
+def upcoming_holidays(payload: view_models.UpcomingHolidaysPayload):
+    return [
+        view_models.Holiday(
+            country_abbreviation=holiday.country_abbreviation,
+            date=holiday.date,
+            holiday_name=holiday.holiday_name,
+        )
+        for holiday in holiday_engine.get_upcoming_holidays(
+            payload.country_abbreviation, payload.start_date, payload.end_date
+        )
+    ]

@@ -4,6 +4,8 @@ from typing import Optional, Union
 import holidays
 import pycountry  # noqa, Pycharm is confused
 
+import src.logic.models as logic_models
+
 holiday_date = Union[dt.date, str]
 
 
@@ -36,6 +38,11 @@ class HolidayEngine:
             for abbreviation in self._cached_supported_countries
         ]
         return supported_countries
+
+    def get_upcoming_holidays(
+        self, country_code: str, start: holiday_date, end: holiday_date
+    ) -> list[logic_models.Holiday]:
+        return []
 
     def is_holiday(self, country_code: str, date: holiday_date) -> bool:
         country_holidays = self._get_cached_country_holidays(country_code)
