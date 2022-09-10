@@ -47,6 +47,15 @@ class TestGetCachedSupportedCountries(unittest.TestCase):
         assert {"GB", "MX", "US"}.intersection(set(cached_countries))
 
 
+class TestGetUpcomingHolidays(unittest.TestCase):
+    def test_handles_no_holidays(self):
+        non_us_holiday = dt.date(year=2022, month=9, day=1)
+        upcoming_holidays = holiday_engine.get_upcoming_holidays(
+            "US", non_us_holiday, non_us_holiday
+        )
+        assert upcoming_holidays == []
+
+
 class TestIsHoliday(unittest.TestCase):
     def test_returns_expected_response(self):
         param_list = [
