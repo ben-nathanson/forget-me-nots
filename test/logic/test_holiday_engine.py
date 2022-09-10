@@ -1,5 +1,6 @@
 import datetime as dt
 import unittest
+from test.logic.test_data import US_INDEPENDENCE_DAY
 
 from src.logic import HolidayEngine, holiday_engine
 
@@ -54,6 +55,16 @@ class TestGetUpcomingHolidays(unittest.TestCase):
             "US", non_us_holiday, non_us_holiday
         )
         assert upcoming_holidays == []
+
+    def test_handles_single_holiday(self):
+        upcoming_holidays = holiday_engine.get_upcoming_holidays(
+            "US", US_INDEPENDENCE_DAY, US_INDEPENDENCE_DAY
+        )
+        assert len(upcoming_holidays) == 1
+        upcoming_holiday, *_ = upcoming_holidays
+        assert upcoming_holiday.country_abbreviation == "US"
+        assert upcoming_holiday.date == US_INDEPENDENCE_DAY
+        assert upcoming_holiday.holiday_name == "Independence Day"
 
 
 class TestIsHoliday(unittest.TestCase):
