@@ -15,9 +15,6 @@ class HolidayEngine:
         )
 
     def _get_cached_country_holidays(self, country_code: str) -> holidays.HolidayBase:
-        # TODO this entire approach to caching is flawed. holidays is calculating the
-        # holidays on the fly, so it's only retrieving holidays for 2022 here.
-        # https://python-holidays.readthedocs.io/en/latest/api.html
         cached_holidays: Optional[
             holidays.HolidayBase
         ] = self._country_holidays_cache.get(country_code, None)
