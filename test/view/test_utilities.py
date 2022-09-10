@@ -2,6 +2,7 @@ from http import HTTPStatus
 from test.utilities import sanitize_mock_path
 from unittest import mock
 
+import holidays
 import pytest
 from fastapi import HTTPException
 
@@ -14,14 +15,15 @@ def mock_holidays():
         yield m
 
 
-def test_get_country_holidays_safely_handles_not_implemented(mock_holidays):
-    mock_holidays.country_holidays.side_effect = NotImplementedError
-    with pytest.raises(HTTPException) as exception:
-        get_country_holidays_safely("US")
+class TestGetCountryHolidaysSafely:
+    def test_handles_not_implemented(self, mock_holidays):
+        mock_holidays.country_holidays.side_effect = NotImplementedError
+        with pytest.raises(HTTPException) as exception:
+            get_country_holidays_safely("US")
 
-    assert exception.value.status_code == HTTPStatus.NOT_IMPLEMENTED
-    assert exception.value.detail == "Not Implemented"
+        assert exception.value.status_code == HTTPStatus.NOT_IMPLEMENTED
+        assert exception.value.detail == "Not Implemented"
 
-
-def test_get_country_holidays_safely_returns_expected_holidays():
-    ...
+    def test_returns_expected_object(self):
+        country_holidays = get_country_holidays_safely("US")
+        assert type(country_holidays) == holidays.countries.united_states.US
