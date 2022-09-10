@@ -1,9 +1,12 @@
+import datetime as dt
 import unittest
+from http import HTTPStatus
 
 import pytest
 from fastapi import HTTPException
 
-from src.view.models import HolidayBasePayload, _convert_to_camel_case  # noqa
+from src.view.models import _convert_to_camel_case  # noqa
+from src.view.models import HolidayBasePayload, UpcomingHolidaysPayload
 
 
 class TestConvertToCamelCase(unittest.TestCase):
@@ -16,6 +19,19 @@ class TestConvertToCamelCase(unittest.TestCase):
         for snake_cased_word, camel_cased_word in param_list:
             with self.subTest():
                 assert _convert_to_camel_case(snake_cased_word) == camel_cased_word
+
+
+class TestUpcomingHolidaysPayload(unittest.TestCase):
+    def test_guarantees_end_date_exceeds_start_date(self):
+        with pytest.raises(HTTPException) as exception:
+            UpcomingHolidaysPayload(
+                country_abbreviation="US",
+                start_date=dt.date(year=2022, month=2, day=1),
+                end_date=dt.date(year=2022, month=1, day=1),
+            )
+
+        assert exception.value.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+        assert exception.value.detail == "End date cannot exceed start date."
 
 
 class TestHolidayBasePayload(unittest.TestCase):

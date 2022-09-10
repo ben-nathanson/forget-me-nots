@@ -1,10 +1,11 @@
 import datetime as dt
 from http import HTTPStatus
+from typing import Optional
 
 import humps  # noqa, PyCharm confuses pyhumps and humps packages
 import pycountry
 from fastapi import HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, root_validator
 
 DATE_FORMAT: str = "%d-%m-%Y"  # day-month-year, e.g. 05-09-2022
 
@@ -72,8 +73,27 @@ class Date(dt.date):
 
 class UpcomingHolidaysPayload(ViewModel):
     country_abbreviation: CountryAbbreviation
-    start_date: Date = dt.date.today()  # type: ignore
-    end_date: Date = dt.date.today() + dt.timedelta(weeks=26)  # type: ignore
+    start_date: Optional[Date]
+    end_date: Optional[Date]
+
+    @root_validator(pre=True)
+    def dates_must_be_populated(cls, values):
+        start_date, end_date = values.get("start_date"), values.get("end_date")
+        if start_date is None:
+            start_date = dt.date.today()
+
+        if end_date is None:
+            six_months = dt.timedelta(weeks=26)
+            end_date = start_date + six_months
+
+        if end_date < start_date:
+            raise HTTPException(
+                HTTPStatus.UNPROCESSABLE_ENTITY,
+                detail="End date cannot exceed start date.",
+            )
+
+        values["start_date"], values["end_date"] = start_date, end_date
+        return values
 
     class Config:
         schema_extra = {
