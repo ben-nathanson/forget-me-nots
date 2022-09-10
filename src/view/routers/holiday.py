@@ -2,7 +2,6 @@ from fastapi import APIRouter
 
 import src.view.models as view_models
 from src.logic import holiday_engine
-from src.logic.models import DateRange
 
 holiday_router = APIRouter(
     prefix="/holidays",
@@ -46,7 +45,8 @@ def supported_countries():
 def upcoming_holidays(payload: view_models.UpcomingHolidaysPayload):
     upcoming_holiday_results = holiday_engine.get_upcoming_holidays(
         payload.country_abbreviation,
-        DateRange(payload.start_date, payload.end_date),  # type: ignore
+        payload.start_date,  # type: ignore
+        payload.end_date,  # type: ignore
     )
     return [
         view_models.Holiday(

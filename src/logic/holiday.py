@@ -49,9 +49,8 @@ class HolidayEngine:
         return supported_countries
 
     def get_upcoming_holidays(
-        self, country_code: str, date_range: logic_models.DateRange
+        self, country_code: str, start: dt.date, end: dt.date
     ) -> list[logic_models.Holiday]:
-        start, end = date_range.start, date_range.end
         country_holidays = self._get_cached_country_holidays(country_code)
         upcoming_holiday_dates: list[dt.date] = sorted(
             [
