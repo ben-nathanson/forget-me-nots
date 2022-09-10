@@ -22,6 +22,29 @@ class TestConvertToCamelCase(unittest.TestCase):
 
 
 class TestUpcomingHolidaysPayload(unittest.TestCase):
+    def populates_start_date(self):
+        payload = UpcomingHolidaysPayload(
+            country_abbreviates="US",
+            end_date=dt.date(year=2022, month=1, day=1),
+        )
+        assert payload.start_date == dt.date.today()
+
+    def populates_end_date(self):
+        payload = UpcomingHolidaysPayload(
+            country_abbreviates="US",
+            start_date=dt.date(year=2022, month=1, day=1),
+        )
+        six_months = dt.timedelta(weeks=26)
+        assert payload.end_date == payload.start_date + six_months
+
+    def populates_both_start_and_end_time(self):
+
+        payload = UpcomingHolidaysPayload(
+            country_abbreviates="US",
+        )
+        six_months = dt.timedelta(weeks=26)
+        assert payload.end_date == payload.start_date + six_months
+
     def test_guarantees_end_date_exceeds_start_date(self):
         with pytest.raises(HTTPException) as exception:
             UpcomingHolidaysPayload(
