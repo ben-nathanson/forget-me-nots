@@ -1,15 +1,49 @@
-class TestIsItAHoliday:
+import datetime as dt
+import unittest
+
+from fastapi.testclient import TestClient
+from requests import Response  # type: ignore
+
+import src.view.models as view_models
+from src.main import api_instance
+
+# TODO this would be a better approach than crafting raw payload dictionaries
+# class ComplexEncoder(json.JSONEncoder):
+#     def default(self, obj: Any):
+#         if isinstance(obj, dt.date):
+#             return obj.strftime(view_models.DATE_FORMAT)
+#         return json.JSONEncoder.default(self, obj)
+
+
+class TestIsItAHoliday(unittest.TestCase):
+    def setUp(self):
+        self.client: TestClient = TestClient(api_instance)
+        self.route: str = "holidays/is-it-a-holiday"
+
+    def get_response(self, payload: view_models.HolidayBasePayload) -> Response:
+        payload.json()
+        raw_payload: dict = {
+            "countryAbbreviation": payload.country_abbreviation,
+            "date": payload.date.strftime(view_models.DATE_FORMAT),
+        }
+        return self.client.post(self.route, json=raw_payload)
+
     def test_returns_expected_response(self):
-        ...
-        # param_list = [
-        #     (dt.datetime(2022, 7, 3), False),
-        #     (dt.datetime(2022, 7, 4), True),
-        #     (dt.datetime(2022, 7, 5), False),
-        # ]
-        # for date, expected_result in param_list:
-        #     with self.subTest():
-        #         holiday_decision: bool = holiday_engine.is_holiday("US", date)
-        #         assert holiday_decision is expected_result
+        param_list = [
+            (dt.datetime(2022, 7, 3), False),
+            (dt.datetime(2022, 7, 4), True),
+            (dt.datetime(2022, 7, 5), False),
+        ]
+        for date, expected_result in param_list:
+            with self.subTest():
+                payload = view_models.HolidayBasePayload(
+                    country_abbreviation="US", date=date
+                )
+                response: Response = self.get_response(payload)
+                parsed_response = view_models.IsHolidayResponse.parse_obj(
+                    response.json()
+                )
+                assert parsed_response.is_holiday == expected_result
 
 
 class TestSupportedCountries:
