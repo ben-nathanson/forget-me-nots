@@ -1,3 +1,5 @@
+#!/bin/zsh
+
 rm -rf venv;
 
 rm -rf .mypy_cache;
