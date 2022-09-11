@@ -21,7 +21,6 @@ class TestIsItAHoliday(unittest.TestCase):
         self.route: str = "holidays/is-it-a-holiday"
 
     def get_response(self, payload: view_models.HolidayBasePayload) -> Response:
-        payload.json()
         raw_payload: dict = {
             "countryAbbreviation": payload.country_abbreviation,
             "date": payload.date.strftime(view_models.DATE_FORMAT),
@@ -46,19 +45,30 @@ class TestIsItAHoliday(unittest.TestCase):
                 assert parsed_response.is_holiday == expected_result
 
 
-class TestSupportedCountries:
+class TestSupportedCountries(unittest.TestCase):
+    def setUp(self):
+        self.client: TestClient = TestClient(api_instance)
+        self.route: str = "holidays/supported-countries"
+
+    def get_response(self) -> list[view_models.CountryResponse]:
+        raw_response: list[dict] = self.client.get(self.route).json()
+        supported_countries = [
+            view_models.CountryResponse.parse_obj(c) for c in raw_response
+        ]
+        return supported_countries
+
     def test_returns_expected_country_detail(self):
-        ...
-        # supported_countries = holiday_engine.get_supported_countries()
-        # united_states, *_ = [c for c in supported_countries if c.alpha_2 == "US"]
-        # assert united_states.flag == "🇺🇸"
-        # assert united_states.name == "United States"
+        supported_countries = self.get_response()
+        united_states, *_ = [
+            c for c in supported_countries if c.country_abbreviation == "US"
+        ]
+        assert united_states.flag == "🇺🇸"
+        assert united_states.name == "United States"
 
     def test_returns_expected_countries(self):
-        ...
-        # supported_countries = holiday_engine.get_supported_countries()
-        # supported_countries_set = {c.alpha_2 for c in supported_countries}
-        # assert {"GB", "MX", "US"}.intersection(supported_countries_set)
+        supported_countries = self.get_response()
+        supported_countries_set = {c.country_abbreviation for c in supported_countries}
+        assert {"GB", "MX", "US"}.intersection(supported_countries_set)
 
 
 class TestUpcomingHolidays:
