@@ -5,8 +5,33 @@ from http import HTTPStatus
 import pytest
 from fastapi import HTTPException
 
-from src.view.models import _convert_to_camel_case  # noqa
-from src.view.models import HolidayBasePayload, UpcomingHolidaysPayload
+from src.view.models import (  # noqa
+    CountryAbbreviation,
+    HolidayBasePayload,
+    UpcomingHolidaysPayload,
+    _convert_to_camel_case,
+)
+
+
+class TestCountryAbbreviation(unittest.TestCase):
+    def test_raises_exception_if_no_string_is_passed(self):
+        with pytest.raises(HTTPException) as exception:
+            CountryAbbreviation.validate(1)
+        assert exception.value.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+        assert exception.value.detail == "Country abbreviation should be a string."
+
+    def test_raises_exception_if_not_two_characters(self):
+        invalid_lengths = [3, 4]
+        for length in invalid_lengths:
+            with self.subTest():
+                abbreviation = "A" * length
+                with pytest.raises(HTTPException) as exception:
+                    CountryAbbreviation.validate(abbreviation)
+                assert exception.value.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+                assert (
+                    exception.value.detail
+                    == "Country abbreviation should be no more than two characters."
+                )
 
 
 class TestConvertToCamelCase(unittest.TestCase):

@@ -27,13 +27,13 @@ class CountryAbbreviation(str):
         if not isinstance(v, str):
             raise HTTPException(
                 HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=f"Country abbreviation should be a string.",
+                detail="Country abbreviation should be a string.",
             )
 
         if len(v) > 2:
             raise HTTPException(
                 HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=f"Country abbreviation should be no more than two characters.",
+                detail="Country abbreviation should be no more than two characters.",
             )
 
         country = pycountry.countries.get(alpha_2=v)
