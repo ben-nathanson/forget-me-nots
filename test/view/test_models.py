@@ -5,11 +5,11 @@ from http import HTTPStatus
 import pytest
 from fastapi import HTTPException
 
-from src.view.models import (  # noqa
+from src.view.models import _convert_to_camel_case  # noqa
+from src.view.models import (
     CountryAbbreviation,
     HolidayBasePayload,
     UpcomingHolidaysPayload,
-    _convert_to_camel_case,
 )
 
 
