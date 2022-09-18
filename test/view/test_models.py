@@ -6,7 +6,32 @@ import pytest
 from fastapi import HTTPException
 
 from src.view.models import _convert_to_camel_case  # noqa
-from src.view.models import HolidayBasePayload, UpcomingHolidaysPayload
+from src.view.models import (
+    CountryAbbreviation,
+    HolidayBasePayload,
+    UpcomingHolidaysPayload,
+)
+
+
+class TestCountryAbbreviation(unittest.TestCase):
+    def test_raises_exception_if_no_string_is_passed(self):
+        with pytest.raises(HTTPException) as exception:
+            CountryAbbreviation.validate(1)
+        assert exception.value.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+        assert exception.value.detail == "Country abbreviation should be a string."
+
+    def test_raises_exception_if_not_two_characters(self):
+        invalid_lengths = [3, 4]
+        for length in invalid_lengths:
+            with self.subTest():
+                abbreviation = "A" * length
+                with pytest.raises(HTTPException) as exception:
+                    CountryAbbreviation.validate(abbreviation)
+                assert exception.value.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+                assert (
+                    exception.value.detail
+                    == "Country abbreviation should be no more than two characters."
+                )
 
 
 class TestConvertToCamelCase(unittest.TestCase):
@@ -22,29 +47,6 @@ class TestConvertToCamelCase(unittest.TestCase):
 
 
 class TestUpcomingHolidaysPayload(unittest.TestCase):
-    def populates_start_date(self):
-        payload = UpcomingHolidaysPayload(
-            country_abbreviates="US",
-            end_date=dt.date(year=2022, month=1, day=1),
-        )
-        assert payload.start_date == dt.date.today()
-
-    def populates_end_date(self):
-        payload = UpcomingHolidaysPayload(
-            country_abbreviates="US",
-            start_date=dt.date(year=2022, month=1, day=1),
-        )
-        six_months = dt.timedelta(weeks=26)
-        assert payload.end_date == payload.start_date + six_months
-
-    def populates_both_start_and_end_time(self):
-
-        payload = UpcomingHolidaysPayload(
-            country_abbreviates="US",
-        )
-        six_months = dt.timedelta(weeks=26)
-        assert payload.end_date == payload.start_date + six_months
-
     def test_guarantees_end_date_exceeds_start_date(self):
         with pytest.raises(HTTPException) as exception:
             UpcomingHolidaysPayload(

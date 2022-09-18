@@ -1,13 +1,10 @@
 import datetime as dt
 from http import HTTPStatus
-from typing import Optional
 
 import humps  # noqa, PyCharm confuses pyhumps and humps packages
 import pycountry
 from fastapi import HTTPException
 from pydantic import BaseModel, root_validator
-
-DATE_FORMAT: str = "%d-%m-%Y"  # day-month-year, e.g. 05-09-2022
 
 
 def _convert_to_camel_case(string: str) -> str:
@@ -30,13 +27,13 @@ class CountryAbbreviation(str):
         if not isinstance(v, str):
             raise HTTPException(
                 HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=f"Country abbreviation should be a string.",
+                detail="Country abbreviation should be a string.",
             )
 
         if len(v) > 2:
             raise HTTPException(
                 HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=f"Country abbreviation should be no more than two characters.",
+                detail="Country abbreviation should be no more than two characters.",
             )
 
         country = pycountry.countries.get(alpha_2=v)
@@ -47,34 +44,10 @@ class CountryAbbreviation(str):
         return v
 
 
-class Date(dt.date):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not isinstance(v, (str, dt.date, dt.datetime)):
-            raise HTTPException(
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail=f"Unrecognized date format, expected {DATE_FORMAT}.",
-            )
-
-        if isinstance(v, str):
-            try:
-                v = dt.datetime.strptime(v, DATE_FORMAT)
-            except ValueError as e:
-                raise HTTPException(
-                    HTTPStatus.UNPROCESSABLE_ENTITY,
-                    detail=f"Unrecognized date format, expected {DATE_FORMAT}.",
-                )
-        return dt.date(v.year, v.month, v.day)
-
-
 class UpcomingHolidaysPayload(ViewModel):
     country_abbreviation: CountryAbbreviation
-    start_date: Optional[Date]
-    end_date: Optional[Date]
+    start_date: dt.date
+    end_date: dt.date
 
     @root_validator(pre=True)
     def dates_must_be_populated(cls, values):
@@ -99,20 +72,23 @@ class UpcomingHolidaysPayload(ViewModel):
         schema_extra = {
             "example": {
                 "countryAbbreviation": "US",
-                "startDate": dt.date.today().strftime(DATE_FORMAT),
-                "endDate": (dt.date.today() + dt.timedelta(weeks=26)).strftime(
-                    DATE_FORMAT
-                ),
+                "startDate": dt.date.today(),
+                "endDate": dt.date.today() + dt.timedelta(weeks=26),
             }
         }
 
 
 class HolidayBasePayload(ViewModel):
     country_abbreviation: CountryAbbreviation
-    date: Date = dt.date.today()  # type: ignore
+    date: dt.date = dt.date.today()  # type: ignore
 
     class Config:
-        schema_extra = {"example": {"date": "05-09-2022", "countryAbbreviation": "US"}}
+        schema_extra = {
+            "example": {
+                "date": dt.date(year=2022, month=9, day=5),
+                "countryAbbreviation": "US",
+            }
+        }
 
 
 class IsHolidayResponse(ViewModel):
@@ -125,7 +101,7 @@ class IsHolidayResponse(ViewModel):
 
 class Holiday(ViewModel):
     holiday_name: str
-    date: Date
+    date: dt.date
     country_abbreviation: CountryAbbreviation
 
 
