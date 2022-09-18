@@ -1,18 +1,19 @@
 import datetime as dt
 import unittest
 
-from fastapi.testclient import TestClient
-from requests import Response  # type: ignore
-
-import src.view.models as view_models
-from src.main import app
-
 # TODO this would be a better approach than crafting raw payload dictionaries
 # class ComplexEncoder(json.JSONEncoder):
 #     def default(self, obj: Any):
 #         if isinstance(obj, dt.date):
 #             return obj.strftime(view_models.DATE_FORMAT)
 #         return json.JSONEncoder.default(self, obj)
+from test.logic.test_data import US_INDEPENDENCE_DAY
+
+from fastapi.testclient import TestClient
+from requests import Response  # type: ignore
+
+import src.view.models as view_models
+from src.main import app
 
 
 class TestIsItAHoliday(unittest.TestCase):
@@ -96,15 +97,20 @@ class TestUpcomingHolidays(unittest.TestCase):
         assert upcoming_holidays == []
 
     def test_handles_single_holiday(self):
-        ...
-        # upcoming_holidays = holiday_engine.get_upcoming_holidays(
-        #     "US", US_INDEPENDENCE_DAY, US_INDEPENDENCE_DAY
-        # )
-        # assert len(upcoming_holidays) == 1
-        # upcoming_holiday, *_ = upcoming_holidays
-        # assert upcoming_holiday.country_abbreviation == "US"
-        # assert upcoming_holiday.date == US_INDEPENDENCE_DAY
-        # assert upcoming_holiday.holiday_name == "Independence Day"
+        payload = view_models.UpcomingHolidaysPayload(
+            country_abbreviation="US",
+            start_date=US_INDEPENDENCE_DAY,
+            end_date=US_INDEPENDENCE_DAY,
+        )
+        raw_response = self.get_response(payload).json()
+        upcoming_holidays = [
+            view_models.Holiday.parse_obj(holiday) for holiday in raw_response
+        ]
+        assert len(upcoming_holidays) == 1
+        upcoming_holiday, *_ = upcoming_holidays
+        assert upcoming_holiday.country_abbreviation == "US"
+        assert upcoming_holiday.date == US_INDEPENDENCE_DAY
+        assert upcoming_holiday.holiday_name == "Independence Day"
 
     def test_handles_multiple_holidays(self):
         ...
