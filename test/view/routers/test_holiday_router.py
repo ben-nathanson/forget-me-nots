@@ -23,7 +23,7 @@ class TestIsItAHoliday(unittest.TestCase):
     def get_response(self, payload: view_models.HolidayBasePayload) -> Response:
         raw_payload: dict = {
             "countryAbbreviation": payload.country_abbreviation,
-            "date": payload.date.strftime(view_models.DATE_FORMAT),
+            "date": payload.date.isoformat(),
         }
         return self.client.post(self.route, json=raw_payload)
 

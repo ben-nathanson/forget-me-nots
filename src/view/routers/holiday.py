@@ -45,8 +45,8 @@ def supported_countries():
 def upcoming_holidays(payload: view_models.UpcomingHolidaysPayload):
     upcoming_holiday_results = holiday_engine.get_upcoming_holidays(
         payload.country_abbreviation,
-        payload.start_date,  # type: ignore
-        payload.end_date,  # type: ignore
+        payload.start_date,
+        payload.end_date,
     )
     return [
         view_models.Holiday(
