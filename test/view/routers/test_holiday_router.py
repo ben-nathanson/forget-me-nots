@@ -113,11 +113,17 @@ class TestUpcomingHolidays(unittest.TestCase):
         assert upcoming_holiday.holiday_name == "Independence Day"
 
     def test_handles_multiple_holidays(self):
-        ...
-        # upcoming_holidays = holiday_engine.get_upcoming_holidays(
-        #     "US", NEW_YEARS_DAY, dt.date(year=2023, month=1, day=2)
-        # )
-        # assert len(upcoming_holidays) == 2
-        # new_years_day, new_years_day_observed = upcoming_holidays
-        # assert new_years_day.holiday_name == "New Year's Day"
-        # assert new_years_day_observed.holiday_name == "New Year's Day (Observed)"
+        payload = view_models.UpcomingHolidaysPayload(
+            country_abbreviation="US",
+            start_date=dt.date(year=2022, month=12, day=23),
+            # TODO suspect there's a boundary issue with the engine
+            end_date=dt.date(year=2022, month=12, day=26),
+        )
+        raw_response = self.get_response(payload).json()
+        upcoming_holidays = [
+            view_models.Holiday.parse_obj(holiday) for holiday in raw_response
+        ]
+
+        assert len(upcoming_holidays) == 2
+        holiday_names = {h.holiday_name for h in upcoming_holidays}
+        assert holiday_names == {"Christmas Day", "Christmas Day (Observed)"}
