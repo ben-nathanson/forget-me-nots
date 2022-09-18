@@ -71,14 +71,29 @@ class TestSupportedCountries(unittest.TestCase):
         assert {"GB", "MX", "US"}.intersection(supported_countries_set)
 
 
-class TestUpcomingHolidays:
+class TestUpcomingHolidays(unittest.TestCase):
+    def setUp(self):
+        self.client: TestClient = TestClient(app)
+        self.route: str = "holidays/upcoming-holidays"
+
+    def get_response(self, payload: view_models.UpcomingHolidaysPayload) -> Response:
+        raw_payload: dict = {
+            "countryAbbreviation": payload.country_abbreviation,
+            "startDate": payload.start_date.isoformat(),
+            "endDate": payload.end_date.isoformat(),
+        }
+        return self.client.post(self.route, json=raw_payload)
+
     def test_handles_no_holidays(self):
-        ...
-        # non_us_holiday = dt.date(year=2022, month=9, day=1)
-        # upcoming_holidays = holiday_engine.get_upcoming_holidays(
-        #     "US", non_us_holiday, non_us_holiday
-        # )
-        # assert upcoming_holidays == []
+        non_us_holiday = dt.date(year=2022, month=9, day=1)
+        upcoming_holidays = self.get_response(
+            view_models.UpcomingHolidaysPayload(
+                country_abbreviation="US",
+                start_date=non_us_holiday,
+                end_date=non_us_holiday,
+            )
+        ).json()
+        assert upcoming_holidays == []
 
     def test_handles_single_holiday(self):
         ...
