@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from requests import Response  # type: ignore
 
 import src.view.models as view_models
-from src.main import api_instance
+from src.main import app
 
 # TODO this would be a better approach than crafting raw payload dictionaries
 # class ComplexEncoder(json.JSONEncoder):
@@ -17,7 +17,7 @@ from src.main import api_instance
 
 class TestIsItAHoliday(unittest.TestCase):
     def setUp(self):
-        self.client: TestClient = TestClient(api_instance)
+        self.client: TestClient = TestClient(app)
         self.route: str = "holidays/is-it-a-holiday"
 
     def get_response(self, payload: view_models.HolidayBasePayload) -> Response:
@@ -47,7 +47,7 @@ class TestIsItAHoliday(unittest.TestCase):
 
 class TestSupportedCountries(unittest.TestCase):
     def setUp(self):
-        self.client: TestClient = TestClient(api_instance)
+        self.client: TestClient = TestClient(app)
         self.route: str = "holidays/supported-countries"
 
     def get_response(self) -> list[view_models.CountryResponse]:
