@@ -1,4 +1,4 @@
-coverage~=6.4.4
+coverage~=6.5.0
 fastapi~=0.85.0
 holidays~=0.15
 pre-commit~=2.20.0
