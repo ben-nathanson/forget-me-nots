@@ -25,3 +25,6 @@ coverage.xml
 coverage.json
 htmlcov
 pytest.xml
+
+# secrets
+**/firebase-credentials.json
