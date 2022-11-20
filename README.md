@@ -7,7 +7,7 @@ experiment with new technology as well as some old favorites (FastAPI, Python, e
 
 # Setup
 - You're going to need
-  - Python (3.10 at time of writing). I recommend `pyenv`.
+  - Python (3.11 at time of writing). I recommend `pyenv`.
   - `pip`
 
 # Running the Server Locally
