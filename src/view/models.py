@@ -4,7 +4,7 @@ from http import HTTPStatus
 import humps  # noqa, PyCharm confuses pyhumps and humps packages
 import pycountry
 from fastapi import HTTPException
-from pydantic import BaseModel, EmailStr, root_validator
+from pydantic import BaseModel, EmailStr, Field, root_validator
 
 
 def _convert_to_camel_case(string: str) -> str:
@@ -126,7 +126,7 @@ class NotImplementedResponse(BaseModel):
 
 class CreateUserPayload(ViewModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=6, max_length=100)
 
 
 class CreateUserResponse(ViewModel):
@@ -135,7 +135,7 @@ class CreateUserResponse(ViewModel):
 
 class LoginPayload(ViewModel):
     email: EmailStr
-    password: str
+    password: str = Field(min_length=6, max_length=100)
 
 
 class LoginResponse(ViewModel):
