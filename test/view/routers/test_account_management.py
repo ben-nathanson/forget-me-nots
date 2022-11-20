@@ -12,6 +12,8 @@ from src.main import app
 
 
 class AccountManagementFixture(unittest.TestCase):
+    create_route: str = "users/create"
+    login_route: str = "users/login"
     random_guid = str(uuid.uuid4())
     email_address: str = f"ben+automatedtesting+{random_guid}@nathanson.dev"
     password: str = secrets.token_urlsafe(15)
@@ -26,11 +28,9 @@ class AccountManagementFixture(unittest.TestCase):
 
 
 class TestCreateUser(AccountManagementFixture):
-    route: str = "users/create"
-
     def test_that_we_can_create_a_user(self):
         raw_payload: dict = {"email": self.email_address, "password": self.password}
-        response: Response = self.client.post(self.route, json=raw_payload)
+        response: Response = self.client.post(self.create_route, json=raw_payload)
         assert response.ok
         assert response.json()["email"] == self.email_address
 
@@ -43,5 +43,22 @@ class TestCreateUser(AccountManagementFixture):
         for email, password in param_list:
             raw_payload: dict = {"email": email, "password": password}
 
-            response: Response = self.client.post(self.route, json=raw_payload)
+            response: Response = self.client.post(self.create_route, json=raw_payload)
             assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+
+
+class TestLogin(AccountManagementFixture):
+    def setUp(self):
+        super().setUp()
+        raw_payload: dict = {"email": self.email_address, "password": self.password}
+        self.client.post(self.create_route, json=raw_payload)
+
+    def test_that_we_can_login(self):
+        raw_payload: dict = {"email": self.email_address, "password": self.password}
+        response: Response = self.client.post(self.login_route, json=raw_payload)
+        response_json: dict = response.json()
+
+        assert response.ok
+        assert response_json["email"] == self.email_address
+        assert len(response_json["idToken"])
+        assert len(response_json["accessToken"])
