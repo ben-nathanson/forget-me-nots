@@ -41,6 +41,7 @@ class TestCreateUser(AccountManagementFixture):
             (self.email_address, None),
             (None, self.password),
             ("", self.password),
+            (self.email_address, ""),
         ]
         for email, password in param_list:
             with self.subTest():
