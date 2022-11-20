@@ -1,7 +1,7 @@
 import json
 
 import requests
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from firebase_admin import auth
 from requests import Response  # type: ignore
 
@@ -24,7 +24,11 @@ def create_user(payload: view_models.CreateUserPayload):
     return view_models.CreateUserResponse(email=user_record.email)
 
 
-@account_management_router.post("/login", response_model=view_models.LoginResponse)
+@account_management_router.post(
+    "/login",
+    response_model=view_models.LoginResponse,
+    responses={403: {"description": "Authentication error."}},
+)
 def login(payload: view_models.LoginPayload):
     url: str = (
         f"https://www.googleapis.com/identitytoolkit/v3/relyingparty"
@@ -39,6 +43,10 @@ def login(payload: view_models.LoginPayload):
         }
     )
     response: Response = requests.post(url, headers=headers, data=request_body)
+
+    if not response.ok:
+        raise HTTPException(status_code=403, detail="Authentication error.")
+
     response_json: dict = response.json()
     return view_models.LoginResponse(
         email=response_json["email"],

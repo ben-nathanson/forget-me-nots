@@ -68,10 +68,19 @@ class TestLogin(AccountManagementFixture):
         assert len(response_json["idToken"])
         assert len(response_json["accessToken"])
 
-    # def test_that_we_cant_login_with_wrong_password(self):
-    #     for password in [self.password[::-1], self.password[1:], self.password[:-1], secrets.token_urlsafe(15)]:
-    #         with self.subTest():
-    #             raw_payload: dict = {"email": self.email_address, "password": password}
-    #             response: Response = self.client.post(self.login_route,
-    #                                                   json=raw_payload)
-    #             assert not response.ok
+    def test_that_we_cant_login_with_wrong_password(self):
+        wrong_passwords = [
+            self.password[::-1],
+            self.password[1:],
+            self.password[:-1],
+            secrets.token_urlsafe(15),
+            "",
+            "password",
+        ]
+        for password in wrong_passwords:
+            with self.subTest():
+                raw_payload: dict = {"email": self.email_address, "password": password}
+                response: Response = self.client.post(
+                    self.login_route, json=raw_payload
+                )
+                assert response.status_code == HTTPStatus.FORBIDDEN
