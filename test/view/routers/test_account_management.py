@@ -41,10 +41,13 @@ class TestCreateUser(AccountManagementFixture):
             ("", self.password),
         ]
         for email, password in param_list:
-            raw_payload: dict = {"email": email, "password": password}
+            with self.subTest():
+                raw_payload: dict = {"email": email, "password": password}
 
-            response: Response = self.client.post(self.create_route, json=raw_payload)
-            assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
+                response: Response = self.client.post(
+                    self.create_route, json=raw_payload
+                )
+                assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
 class TestLogin(AccountManagementFixture):
