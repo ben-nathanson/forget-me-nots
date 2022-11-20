@@ -3,7 +3,7 @@ import json
 import requests
 from fastapi import APIRouter
 from firebase_admin import auth
-from requests import Response
+from requests import Response  # type: ignore
 
 import src.view.models as view_models
 
