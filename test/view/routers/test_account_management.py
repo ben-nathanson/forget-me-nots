@@ -74,7 +74,6 @@ class TestLogin(AccountManagementFixture):
             self.password[1:],
             self.password[:-1],
             secrets.token_urlsafe(15),
-            "",
             "password",
         ]
         for password in wrong_passwords:
