@@ -72,7 +72,7 @@ class TestSupportedCountries(unittest.TestCase):
         assert {"GB", "MX", "US"}.intersection(supported_countries_set)
 
 
-class TestUpcomingHolidays(unittest.TestCase):
+class TestUpcomingHolidays(unittest.TestSuite):
     def setUp(self):
         self.client: TestClient = TestClient(app)
         self.route: str = "holidays/upcoming-holidays"
