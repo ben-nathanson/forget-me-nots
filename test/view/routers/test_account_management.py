@@ -1,6 +1,7 @@
 import secrets
 import unittest
 import uuid
+from http import HTTPStatus
 
 from fastapi.testclient import TestClient
 from firebase_admin import auth
@@ -32,3 +33,15 @@ class TestCreateUser(AccountManagementFixture):
         response: Response = self.client.post(self.route, json=raw_payload)
         assert response.ok
         assert response.json()["email"] == self.email_address
+
+    def test_that_we_validate_inputs(self):
+        param_list = [
+            (self.email_address, None),
+            (None, self.password),
+            ("", self.password),
+        ]
+        for email, password in param_list:
+            raw_payload: dict = {"email": email, "password": password}
+
+            response: Response = self.client.post(self.route, json=raw_payload)
+            assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
