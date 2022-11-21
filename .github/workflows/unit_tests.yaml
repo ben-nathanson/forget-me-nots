@@ -19,6 +19,8 @@ jobs:
         run: |
           pip install pytest-cov
           python3 -m pytest --cov=./ --cov-report=xml
+        env:
+          SECRET_FIREBASE_CREDENTIALS: ${{ secrets.SECRET_FIREBASE_CREDENTIALS }}
       - name: Upload coverage to codecov.io
         run: bash <(curl -s https://codecov.io/bash)
         if: always()
