@@ -8,11 +8,7 @@ def get_firebase_credentials() -> dict:
     if os.path.exists(credentials_path):
         credentials = json.load(open(credentials_path))
     else:
-        credentials: dict = json.loads(
-            os.environ.get(
-                "SECRET_FIREBASE_CREDENTIALS",
-            )
-        )
+        credentials: dict = json.loads(os.environ.get("SECRET_FIREBASE_CREDENTIALS"))
     return credentials
 
 
