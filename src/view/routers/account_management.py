@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 from fastapi import APIRouter, HTTPException
@@ -9,9 +10,10 @@ import src.view.models as view_models
 
 account_management_router = APIRouter(prefix="/users", tags=["users"])
 
-with open("src/firebase-credentials.json") as credentials_file:
-    CREDENTIALS = json.load(credentials_file)
-API_KEY = CREDENTIALS["api_key"]
+credential_data: dict = os.getenv(
+    "SECRET_FIREBASE_CREDENTIALS", json.load(open("src/firebase-credentials.json"))
+)
+API_KEY = credential_data["api_key"]
 
 
 @account_management_router.post(
