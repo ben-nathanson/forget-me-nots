@@ -23,8 +23,8 @@ class CredentialManager:
         self.firebase_cert = Certificate(self._raw_firebase_credentials)
         self.firebase_api_key = self._raw_firebase_credentials["api_key"]
 
-    def get_firebase_cert(self) -> Certificate:
-        return self.firebase_cert
-
     def get_firebase_api_key(self) -> str:
         return self.firebase_api_key
+
+    def get_firebase_cert(self) -> Certificate:
+        return self.firebase_cert
