@@ -31,7 +31,7 @@ def create_user(payload: view_models.CreateUserPayload):
 def login(payload: view_models.LoginPayload):
     url: str = (
         f"https://www.googleapis.com/identitytoolkit/v3/relyingparty"
-        f"/verifyPassword?key={credential_manager.firebase_api_key}"
+        f"/verifyPassword?key={credential_manager.get_firebase_api_key()}"
     )
     headers = {"content-type": "application/json; charset=UTF-8"}
     request_body = json.dumps(
