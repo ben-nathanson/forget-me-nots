@@ -10,7 +10,7 @@ import src.view.models as view_models
 
 account_management_router = APIRouter(prefix="/users", tags=["users"])
 
-credential_data: dict = os.getenv(
+credential_data: dict = os.environ.get(
     "SECRET_FIREBASE_CREDENTIALS", json.load(open("src/firebase-credentials.json"))
 )
 API_KEY = credential_data["api_key"]

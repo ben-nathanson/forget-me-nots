@@ -8,7 +8,7 @@ from firebase_admin.credentials import Certificate
 from src.view.routers.account_management import account_management_router
 from src.view.routers.holiday import holiday_router
 
-credential_data: dict = os.getenv(
+credential_data: dict = os.environ.get(
     "SECRET_FIREBASE_CREDENTIALS", json.load(open("src/firebase-credentials.json"))
 )
 firebase_cert: Certificate = Certificate(credential_data)
