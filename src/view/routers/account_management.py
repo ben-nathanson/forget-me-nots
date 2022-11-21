@@ -1,5 +1,4 @@
 import json
-import os
 
 import requests
 from fastapi import APIRouter, HTTPException
@@ -7,13 +6,11 @@ from firebase_admin import auth
 from requests import Response  # type: ignore
 
 import src.view.models as view_models
+from src.config import get_firebase_api_key
 
 account_management_router = APIRouter(prefix="/users", tags=["users"])
 
-credential_data: dict = os.environ.get(
-    "SECRET_FIREBASE_CREDENTIALS", json.load(open("src/firebase-credentials.json"))
-)
-API_KEY = credential_data["api_key"]
+API_KEY = get_firebase_api_key()
 
 
 @account_management_router.post(
