@@ -29,7 +29,7 @@ class TestCredentialManager(unittest.TestCase):
         os.environ.pop(self.firebase_credentials_path, None)
 
     def test_can_get_credentials_from_file(self):
-        with open(self.firebase_credentials_path, "w+") as credentials_file:
+        with open(self.firebase_credentials_path, "w") as credentials_file:
             credentials_file.write(json.dumps(MOCK_CREDENTIALS))
 
         credential_manager: CredentialManager = CredentialManager(
