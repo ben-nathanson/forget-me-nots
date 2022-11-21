@@ -6,9 +6,9 @@ from firebase_admin.credentials import Certificate
 
 
 class CredentialManager:
-    _raw_firebase_credentials: dict
     _firebase_credentials_path: str
     _firebase_environment_key: str
+    _raw_firebase_credentials: dict
 
     def __init__(
         self,
