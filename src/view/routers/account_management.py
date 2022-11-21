@@ -6,11 +6,11 @@ from firebase_admin import auth
 from requests import Response  # type: ignore
 
 import src.view.models as view_models
-from src.config import get_firebase_api_key
+from src.config import CredentialManager
 
 account_management_router = APIRouter(prefix="/users", tags=["users"])
 
-API_KEY = get_firebase_api_key()
+credential_manager = CredentialManager()
 
 
 @account_management_router.post(
@@ -31,7 +31,7 @@ def create_user(payload: view_models.CreateUserPayload):
 def login(payload: view_models.LoginPayload):
     url: str = (
         f"https://www.googleapis.com/identitytoolkit/v3/relyingparty"
-        f"/verifyPassword?key={API_KEY}"
+        f"/verifyPassword?key={credential_manager.firebase_api_key}"
     )
     headers = {"content-type": "application/json; charset=UTF-8"}
     request_body = json.dumps(
