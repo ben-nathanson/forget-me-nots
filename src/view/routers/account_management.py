@@ -1,26 +1,16 @@
-import json
-
-import requests
-from fastapi import APIRouter, HTTPException
-from firebase_admin import auth
-from requests import Response  # type: ignore
+from fastapi import APIRouter
 
 import src.view.models as view_models
-from src.config import CredentialManager
+from src.logic.services.account_management import AccountManagementService, SessionToken
 
 account_management_router = APIRouter(prefix="/users", tags=["users"])
 
-credential_manager = CredentialManager()
+account_management_service = AccountManagementService()
 
 
-@account_management_router.post(
-    "/create", response_model=view_models.CreateUserResponse
-)
+@account_management_router.post("/create")
 def create_user(payload: view_models.CreateUserPayload):
-    user_record: auth.UserRecord = auth.create_user(
-        email=payload.email, password=payload.password
-    )
-    return view_models.CreateUserResponse(email=user_record.email)
+    account_management_service.create_user(payload.email, payload.password)
 
 
 @account_management_router.post(
@@ -29,27 +19,12 @@ def create_user(payload: view_models.CreateUserPayload):
     responses={403: {"description": "Authentication error."}},
 )
 def login(payload: view_models.LoginPayload):
-    url: str = (
-        f"https://www.googleapis.com/identitytoolkit/v3/relyingparty"
-        f"/verifyPassword?key={credential_manager.get_firebase_api_key()}"
+    session_token: SessionToken = account_management_service.login(
+        payload.email, payload.password
     )
-    headers = {"content-type": "application/json; charset=UTF-8"}
-    request_body = json.dumps(
-        {
-            "email": payload.email,
-            "password": payload.password,
-            "returnSecureToken": True,
-        }
-    )
-    response: Response = requests.post(url, headers=headers, data=request_body)
-
-    if not response.ok:
-        raise HTTPException(status_code=403, detail="Authentication error.")
-
-    response_json: dict = response.json()
     return view_models.LoginResponse(
-        email=response_json["email"],
-        expires_in=response_json["expiresIn"],
-        id_token=response_json["idToken"],
-        access_token=response_json["refreshToken"],
+        email=session_token.email,
+        expires_in=session_token.expires_in,
+        id_token=session_token.id_token,
+        access_token=session_token.access_token,
     )

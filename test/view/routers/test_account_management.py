@@ -3,6 +3,7 @@ import unittest
 import uuid
 from http import HTTPStatus
 
+import firebase_admin.auth
 from fastapi.testclient import TestClient
 from firebase_admin import auth
 from firebase_admin.auth import UserNotFoundError, UserRecord
@@ -34,7 +35,7 @@ class TestCreateUser(AccountManagementFixture):
         raw_payload: dict = {"email": self.email_address, "password": self.password}
         response: Response = self.client.post(self.create_route, json=raw_payload)
         assert response.ok
-        assert response.json()["email"] == self.email_address
+        assert firebase_admin.auth.get_user_by_email(self.email_address)
 
     def test_that_we_validate_inputs(self):
         param_list = [
