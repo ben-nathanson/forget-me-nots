@@ -135,7 +135,7 @@ class CreateUserResponse(ViewModel):
 
 class LoginPayload(ViewModel):
     email: EmailStr
-    password: str = Field(min_length=6, max_length=100)
+    password: str
 
 
 class LoginResponse(ViewModel):
