@@ -1,4 +1,4 @@
-import re
+SPECIAL_CHARACTERS = " !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~"
 
 
 def is_strong_password(password: str) -> bool:
@@ -11,7 +11,7 @@ def is_strong_password(password: str) -> bool:
         [character for character in password if character.isnumeric()]
     )
     contains_special_characters: bool = any(
-        [character for character in password if not re.match("[A-Za-z0-9]", character)]
+        [character for character in password if character in SPECIAL_CHARACTERS]
     )
     is_longer_than_six_characters = len(password) >= 6
     if (
