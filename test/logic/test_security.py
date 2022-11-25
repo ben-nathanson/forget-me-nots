@@ -1,9 +1,26 @@
+import random
+import string
 import unittest
 
 from src.logic.security import is_strong_password
 
 
 class TestPasswordChecker(unittest.TestCase):
+    @staticmethod
+    def _generate_strong_password() -> str:
+        uppercase_letter: str = random.choice(string.ascii_uppercase)
+        lowercase_letter: str = random.choice(string.ascii_lowercase)
+        letters: str = "".join(
+            [random.choice(string.ascii_letters) for _ in range(random.randint(3, 97))]
+        )
+        number: str = str(random.randint(0, 9))
+        password_components: list[str] = list(
+            f"{letters}{uppercase_letter}{lowercase_letter}{number}"
+        )
+        random.shuffle(password_components)
+
+        return str(password_components)
+
     def test_rejects_bad_passwords(self):
         bad_passwords = [
             123,
@@ -31,3 +48,11 @@ class TestPasswordChecker(unittest.TestCase):
         for password in good_passwords:
             with self.subTest():
                 assert is_strong_password(password)
+
+    def test_fuzz_test_password_requirements(self):
+        good_passwords: list[str] = [
+            self._generate_strong_password() for _ in range(100)
+        ]
+        for password in good_passwords:
+            with self.subTest():
+                assert is_strong_password(password), password
