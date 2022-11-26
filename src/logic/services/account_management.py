@@ -8,7 +8,8 @@ from firebase_admin import auth as firebase_auth
 from requests import Response
 
 from src.config import CredentialManager
-from src.logic.security import is_strong_password
+
+SPECIAL_CHARACTERS = " !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~"
 
 
 @dataclass
@@ -32,13 +33,38 @@ class AccountManagementService:
         self._credential_manager = credential_service or CredentialManager()
 
     def create_user(self, email: str, password: str):
-        if not is_strong_password(password):
+        if not self.is_strong_password(password):
             raise ValueError("Password is too weak.")
 
         if email == password:
             raise ValueError("Email and password should not match.")
 
         self._auth_service.create_user(email=email, password=password)
+
+    @staticmethod
+    def is_strong_password(password: str) -> bool:
+        if not isinstance(password, str):
+            return False
+
+        contains_lowercase: bool = password.upper() != password
+        contains_uppercase: bool = password.lower() != password
+        contains_numbers: bool = any(
+            [character for character in password if character.isnumeric()]
+        )
+        contains_special_characters: bool = any(
+            [character for character in password if character in SPECIAL_CHARACTERS]
+        )
+        is_longer_than_six_characters = len(password) >= 6
+        if (
+            contains_lowercase
+            and contains_uppercase
+            and contains_numbers
+            and contains_special_characters
+            and is_longer_than_six_characters
+        ):
+            return True
+        else:
+            return False
 
     def login(self, email: str, password: str) -> SessionToken:
         url: str = (

@@ -1,4 +1,6 @@
+import random
 import secrets
+import string
 import unittest
 import uuid
 from http import HTTPStatus
@@ -9,6 +11,10 @@ from firebase_admin import auth
 from firebase_admin.auth import UserNotFoundError, UserRecord
 from requests import Response  # type: ignore
 
+from src.logic.services.account_management import (
+    SPECIAL_CHARACTERS,
+    AccountManagementService,
+)
 from src.main import app
 
 
@@ -100,3 +106,57 @@ class TestLogin(AccountManagementFixture):
                     self.login_route, json=raw_payload
                 )
                 assert response.status_code == HTTPStatus.FORBIDDEN
+
+
+class TestPasswordChecker(unittest.TestCase):
+    @staticmethod
+    def _generate_strong_password() -> str:
+        uppercase_letter: str = random.choice(string.ascii_uppercase)
+        lowercase_letter: str = random.choice(string.ascii_lowercase)
+        letters: str = "".join(
+            [random.choice(string.ascii_letters) for _ in range(random.randint(3, 5))]
+        )
+        number: str = str(random.randint(0, 9))
+        special_character: str = random.choice(SPECIAL_CHARACTERS)
+        password_components: list[str] = list(
+            f"{letters}{uppercase_letter}{lowercase_letter}{number}{special_character}"
+        )
+        random.shuffle(password_components)
+
+        return "".join(password_components)
+
+    def test_rejects_bad_passwords(self):
+        bad_passwords = [
+            123,
+            "",
+            "password",
+            "lks~!",
+            "lowercase",
+            "UPPERCASE",
+            "NoSpecialCharacters",
+            "NoNumbers!",
+            "cH^qmmjSj",
+            "2cH88qmmjSj",
+        ]
+        for password in bad_passwords:
+            with self.subTest():
+                assert not AccountManagementService.is_strong_password(password)
+
+    def test_accepts_good_passwords(self):
+        good_passwords = [
+            "2cH88^qmmjSj",
+            "7S$u37M8M^kF",
+            "wK27*rv7@$Jx",
+            "dL_aR1qq8KTk1hl2oMxg",
+        ]
+        for password in good_passwords:
+            with self.subTest():
+                assert AccountManagementService.is_strong_password(password)
+
+    def test_fuzz_test_password_requirements(self):
+        good_passwords: list[str] = [
+            self._generate_strong_password() for _ in range(100)
+        ]
+        for password in good_passwords:
+            with self.subTest():
+                assert AccountManagementService.is_strong_password(password), password
