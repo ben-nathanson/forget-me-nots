@@ -9,7 +9,7 @@ from requests import Response
 
 from src.config import CredentialManager
 
-SPECIAL_CHARACTERS = " !\"#$%&'()*+,-./:;<=>?@[]^_`{|}~"
+SPECIAL_CHARACTERS = " !\"#$%&'()*+,-.:;<=>?@[]^_`{|}~"
 
 
 @dataclass
@@ -33,11 +33,11 @@ class AccountManagementService:
         self._credential_manager = credential_service or CredentialManager()
 
     def create_user(self, email: str, password: str):
-        if not self.is_strong_password(password):
-            raise ValueError("Password is too weak.")
-
         if email == password:
             raise ValueError("Email and password should not match.")
+
+        if not self.is_strong_password(password):
+            raise ValueError("Password is too weak.")
 
         self._auth_service.create_user(email=email, password=password)
 
@@ -54,13 +54,13 @@ class AccountManagementService:
         contains_special_characters: bool = any(
             [character for character in password if character in SPECIAL_CHARACTERS]
         )
-        is_longer_than_six_characters = len(password) >= 6
+        is_at_least_six_characters = len(password) >= 6
         if (
             contains_lowercase
             and contains_uppercase
             and contains_numbers
             and contains_special_characters
-            and is_longer_than_six_characters
+            and is_at_least_six_characters
         ):
             return True
         else:
