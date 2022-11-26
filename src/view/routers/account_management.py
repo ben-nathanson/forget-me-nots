@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 
 import src.view.models as view_models
 from src.logic.services.account_management import AccountManagementService, SessionToken
@@ -10,7 +10,10 @@ account_management_service = AccountManagementService()
 
 @account_management_router.post("/create")
 def create_user(payload: view_models.CreateUserPayload):
-    account_management_service.create_user(payload.email, payload.password)
+    try:
+        account_management_service.create_user(payload.email, payload.password)
+    except ValueError as error:
+        raise HTTPException(status_code=422, detail=str(error))
 
 
 @account_management_router.post(
