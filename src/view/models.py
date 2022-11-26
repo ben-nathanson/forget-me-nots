@@ -1,14 +1,19 @@
 import datetime as dt
+import uuid
 from http import HTTPStatus
 
 import humps  # noqa, PyCharm confuses pyhumps and humps packages
 import pycountry
 from fastapi import HTTPException
-from pydantic import BaseModel, root_validator
+from pydantic import BaseModel, EmailStr, Field, root_validator
 
 
 def _convert_to_camel_case(string: str) -> str:
     return humps.camelize(string)  # type: ignore
+
+
+EXAMPLE_EMAIL = f"ben+{str(uuid.uuid4())}@nathanson.dev"
+EXAMPLE_PASSWORD = "7yxM!CyRH"
 
 
 class ViewModel(BaseModel):
@@ -122,3 +127,36 @@ class SupportedCountriesResponse(ViewModel):
 
 class NotImplementedResponse(BaseModel):
     message: str = "Not implemented"
+
+
+class CreateUserPayload(ViewModel):
+    email: EmailStr
+    password: str = Field(
+        min_length=6,
+        max_length=100,
+        description="A password containing between 6 and 100 characters, including at "
+        "least one lowercase letter, one uppercase letter, one number, "
+        "and one special character",
+    )
+
+    class Config:
+        schema_extra = {
+            "example": {"email": EXAMPLE_EMAIL, "password": EXAMPLE_PASSWORD}
+        }
+
+
+class LoginPayload(ViewModel):
+    email: EmailStr
+    password: str
+
+    class Config:
+        schema_extra = {
+            "example": {"email": EXAMPLE_EMAIL, "password": EXAMPLE_PASSWORD}
+        }
+
+
+class LoginResponse(ViewModel):
+    email: EmailStr
+    expires_in: int
+    id_token: str
+    access_token: str

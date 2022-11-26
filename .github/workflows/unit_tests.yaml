@@ -16,6 +16,8 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 # Credit for this goes to https://til.simonwillison.net/pytest/pytest-code-coverage
       - name: Generate coverage report
+        env:
+          SECRET_FIREBASE_CREDENTIALS: ${{ secrets.SECRET_FIREBASE_CREDENTIALS }}
         run: |
           pip install pytest-cov
           python3 -m pytest --cov=./ --cov-report=xml
