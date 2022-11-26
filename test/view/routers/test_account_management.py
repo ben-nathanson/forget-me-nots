@@ -18,12 +18,28 @@ from src.logic.services.account_management import (
 from src.main import app
 
 
+def generate_strong_password() -> str:
+    uppercase_letter: str = random.choice(string.ascii_uppercase)
+    lowercase_letter: str = random.choice(string.ascii_lowercase)
+    letters: str = "".join(
+        [random.choice(string.ascii_letters) for _ in range(random.randint(3, 5))]
+    )
+    number: str = str(random.randint(0, 9))
+    special_character: str = random.choice(SPECIAL_CHARACTERS)
+    password_components: list[str] = list(
+        f"{letters}{uppercase_letter}{lowercase_letter}{number}{special_character}"
+    )
+    random.shuffle(password_components)
+
+    return "".join(password_components)
+
+
 class AccountManagementFixture(unittest.TestCase):
     create_route: str = "users/create"
     login_route: str = "users/login"
     random_guid = str(uuid.uuid4())
     email_address: str = f"ben+automatedtesting+{random_guid}@nathanson.dev"
-    password: str = secrets.token_urlsafe(15)
+    password: str = generate_strong_password()
 
     def setUp(self):  # noqa
         self.client: TestClient = TestClient(app)
@@ -109,22 +125,6 @@ class TestLogin(AccountManagementFixture):
 
 
 class TestPasswordChecker(unittest.TestCase):
-    @staticmethod
-    def _generate_strong_password() -> str:
-        uppercase_letter: str = random.choice(string.ascii_uppercase)
-        lowercase_letter: str = random.choice(string.ascii_lowercase)
-        letters: str = "".join(
-            [random.choice(string.ascii_letters) for _ in range(random.randint(3, 5))]
-        )
-        number: str = str(random.randint(0, 9))
-        special_character: str = random.choice(SPECIAL_CHARACTERS)
-        password_components: list[str] = list(
-            f"{letters}{uppercase_letter}{lowercase_letter}{number}{special_character}"
-        )
-        random.shuffle(password_components)
-
-        return "".join(password_components)
-
     def test_rejects_bad_passwords(self):
         bad_passwords = [
             123,
@@ -154,9 +154,7 @@ class TestPasswordChecker(unittest.TestCase):
                 assert AccountManagementService.is_strong_password(password)
 
     def test_fuzz_test_password_requirements(self):
-        good_passwords: list[str] = [
-            self._generate_strong_password() for _ in range(100)
-        ]
+        good_passwords: list[str] = [generate_strong_password() for _ in range(100)]
         for password in good_passwords:
             with self.subTest():
                 assert AccountManagementService.is_strong_password(password), password
