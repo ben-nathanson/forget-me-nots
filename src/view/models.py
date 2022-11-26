@@ -7,13 +7,15 @@ import pycountry
 from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, Field, root_validator
 
+from src.logic.services.account_management import generate_strong_password
+
 
 def _convert_to_camel_case(string: str) -> str:
     return humps.camelize(string)  # type: ignore
 
 
 EXAMPLE_EMAIL = f"ben+{str(uuid.uuid4())}@nathanson.dev"
-EXAMPLE_PASSWORD = "7yxM!CyRH"
+EXAMPLE_PASSWORD = generate_strong_password()
 
 
 class ViewModel(BaseModel):
