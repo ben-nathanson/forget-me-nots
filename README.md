@@ -12,10 +12,10 @@ experiment with new technology as well as some old favorites (FastAPI, Python, e
   - A valid Firebase config at `src/firebase-credentials.json`
 
 # Firebase Configuration
-Create a new application in [Firebase](console.firebase.google.com).
+Create a new application in [Firebase](https://firebase.google.com/).
 
-You will need both an API key as well as the Firebase admin credentials. Altogether the
-JSON should resemble the following:
+You will need a Firebase API key as well as Firebase admin credentials. The JSON
+configuration should resemble the following:
 
 ```JSON
 {
@@ -29,7 +29,7 @@ JSON should resemble the following:
     "private_key_id": "test-key-id",
     "project_id": "test-project-id-123",
     "token_uri": "www.test.test",
-    "type": "service_account",
+    "type": "service_account"
 }
 ```
 
