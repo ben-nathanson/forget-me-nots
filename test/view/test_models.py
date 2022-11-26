@@ -64,7 +64,7 @@ class TestHolidayBasePayload(unittest.TestCase):
         nonexistent_country_codes = ["//", "??", "(("]
         for country_alpha_2 in nonexistent_country_codes:
             with self.subTest():
-                with pytest.raises(HTTPException) as exception:
+                with pytest.raises(HTTPException):
                     HolidayBasePayload(country_abbreviation=country_alpha_2)
 
     def test_constructs_class_successfully_for_expected_country(self):
