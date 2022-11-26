@@ -104,7 +104,7 @@ def generate_strong_password() -> str:
     uppercase_letter: str = secrets.choice(string.ascii_uppercase)
     lowercase_letter: str = secrets.choice(string.ascii_lowercase)
     letters: str = "".join(
-        [secrets.choice(string.ascii_letters) for _ in range(random.randint(3, 5))]
+        [secrets.choice(string.ascii_letters) for _ in range(secrets.randbelow(2) + 3)]
     )
     number: str = str(secrets.randbelow(9))
     special_character: str = secrets.choice(SPECIAL_CHARACTERS)
