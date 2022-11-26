@@ -3,13 +3,16 @@ from dataclasses import dataclass
 from typing import Optional
 
 import requests
-from fastapi import HTTPException
 from firebase_admin import auth as firebase_auth
 from requests import Response
 
 from src.config import CredentialManager
 
 SPECIAL_CHARACTERS = " !\"#$%&'()*+,-.:;<=>?@[]^_`{|}~"
+
+
+class AuthenticationError(Exception):
+    ...
 
 
 @dataclass
@@ -82,7 +85,7 @@ class AccountManagementService:
         response: Response = requests.post(url, headers=headers, data=request_body)
 
         if not response.ok:
-            raise HTTPException(status_code=403, detail="Authentication error.")
+            raise AuthenticationError
 
         response_json: dict = response.json()
         session_token: SessionToken = SessionToken(

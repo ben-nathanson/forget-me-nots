@@ -1,7 +1,11 @@
 from fastapi import APIRouter, HTTPException
 
 import src.view.models as view_models
-from src.logic.services.account_management import AccountManagementService, SessionToken
+from src.logic.services.account_management import (
+    AccountManagementService,
+    AuthenticationError,
+    SessionToken,
+)
 
 account_management_router = APIRouter(prefix="/users", tags=["users"])
 
@@ -22,12 +26,15 @@ def create_user(payload: view_models.CreateUserPayload):
     responses={403: {"description": "Authentication error."}},
 )
 def login(payload: view_models.LoginPayload):
-    session_token: SessionToken = account_management_service.login(
-        payload.email, payload.password
-    )
-    return view_models.LoginResponse(
-        email=session_token.email,
-        expires_in=session_token.expires_in,
-        id_token=session_token.id_token,
-        access_token=session_token.access_token,
-    )
+    try:
+        session_token: SessionToken = account_management_service.login(
+            payload.email, payload.password
+        )
+        return view_models.LoginResponse(
+            email=session_token.email,
+            expires_in=session_token.expires_in,
+            id_token=session_token.id_token,
+            access_token=session_token.access_token,
+        )
+    except AuthenticationError as error:
+        raise HTTPException(status_code=403, detail=str(error))
