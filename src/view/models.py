@@ -153,10 +153,6 @@ class CreateUserPayload(ViewModel):
         }
 
 
-class CreateUserResponse(ViewModel):
-    email: EmailStr
-
-
 class LoginPayload(ViewModel):
     email: EmailStr
     password: str
