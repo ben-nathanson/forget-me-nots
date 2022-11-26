@@ -133,7 +133,7 @@ class TestPasswordChecker(unittest.TestCase):
             "lks~!",
             "lowercase",
             "UPPERCASE",
-            "NoSpecialCharacters",
+            "NoSpecialCharacters123",
             "NoNumbers!",
             "cH^qmmjSj",
             "2cH88qmmjSj",
