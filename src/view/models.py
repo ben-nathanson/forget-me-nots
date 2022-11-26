@@ -136,7 +136,9 @@ class CreateUserPayload(ViewModel):
     password: str = Field(
         min_length=6,
         max_length=100,
-        description="A password containing between 6 and 100 characters, including at least one lowercase letter, one uppercase letter, one number, and one special character",
+        description="A password containing between 6 and 100 characters, including at "
+        "least one lowercase letter, one uppercase letter, one number, "
+        "and one special character",
     )
 
     @validator("password")
