@@ -2,7 +2,7 @@ import random
 import string
 import unittest
 
-from src.logic.security import is_strong_password
+from src.logic.security import SPECIAL_CHARACTERS, is_strong_password
 
 
 class TestPasswordChecker(unittest.TestCase):
@@ -11,15 +11,16 @@ class TestPasswordChecker(unittest.TestCase):
         uppercase_letter: str = random.choice(string.ascii_uppercase)
         lowercase_letter: str = random.choice(string.ascii_lowercase)
         letters: str = "".join(
-            [random.choice(string.ascii_letters) for _ in range(random.randint(3, 97))]
+            [random.choice(string.ascii_letters) for _ in range(random.randint(3, 5))]
         )
         number: str = str(random.randint(0, 9))
+        special_character: str = random.choice(SPECIAL_CHARACTERS)
         password_components: list[str] = list(
-            f"{letters}{uppercase_letter}{lowercase_letter}{number}"
+            f"{letters}{uppercase_letter}{lowercase_letter}{number}{special_character}"
         )
         random.shuffle(password_components)
 
-        return str(password_components)
+        return "".join(password_components)
 
     def test_rejects_bad_passwords(self):
         bad_passwords = [

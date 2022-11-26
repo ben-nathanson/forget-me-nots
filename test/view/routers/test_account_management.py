@@ -34,8 +34,23 @@ class TestCreateUser(AccountManagementFixture):
     def test_that_we_can_create_a_user(self):
         raw_payload: dict = {"email": self.email_address, "password": self.password}
         response: Response = self.client.post(self.create_route, json=raw_payload)
-        assert response.ok
+        assert response.ok, (self.email_address, self.password)
         assert firebase_admin.auth.get_user_by_email(self.email_address)
+
+    def test_that_we_reject_weak_passwords(self):
+        param_list = [
+            (self.email_address, "password"),
+            (self.email_address, "123"),
+            (self.email_address, self.email_address),
+        ]
+        for email, password in param_list:
+            with self.subTest():
+                raw_payload: dict = {"email": email, "password": password}
+
+                response: Response = self.client.post(
+                    self.create_route, json=raw_payload
+                )
+                assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY, password
 
     def test_that_we_validate_inputs(self):
         param_list = [
@@ -65,7 +80,7 @@ class TestLogin(AccountManagementFixture):
         response: Response = self.client.post(self.login_route, json=raw_payload)
         response_json: dict = response.json()
 
-        assert response.ok
+        assert response.ok, (self.email_address, self.password)
         assert response_json["email"] == self.email_address
         assert len(response_json["idToken"])
         assert len(response_json["accessToken"])
