@@ -2,8 +2,12 @@
 
 [![codecov](https://codecov.io/gh/ben-nathanson/forget-me-nots/branch/master/graph/badge.svg?token=LCOJVXF9W4)](https://codecov.io/gh/ben-nathanson/forget-me-nots)
 
-Forget Me Nots is an API for discovering holidays. This project is an excuse for me to
-experiment with new technology as well as some old favorites (FastAPI, Python, etc.).
+Forget Me Nots is an API for anything you would want to remember, including:
+- Holidays
+
+We're also looking at adding:
+- TODO list
+- Reminders
 
 # Setup
 - You're going to need
@@ -85,3 +89,10 @@ test/logic/test_holiday_engine.py::test_get_cached_country_holidays_handles_cach
 # Browsing Test Coverage
 Run `./run_coverage_browser.sh`. You should see something like this:
 ![Coverage HTML](./docs/coverage_html_example.png)
+
+# Disclaimer
+
+This project serves as more of an excuse for me to experiment with new tools and design
+patterns as well as some old favorites (FastAPI, Python, etc.).
+
+**I don't intend to deploy this and maintain it as a real production application.**
