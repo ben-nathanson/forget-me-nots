@@ -5,9 +5,7 @@ from http import HTTPStatus
 import humps  # noqa, PyCharm confuses pyhumps and humps packages
 import pycountry
 from fastapi import HTTPException
-from pydantic import BaseModel, EmailStr, Field, root_validator, validator
-
-from src.logic.security import is_strong_password
+from pydantic import BaseModel, EmailStr, Field, root_validator
 
 
 def _convert_to_camel_case(string: str) -> str:
@@ -140,14 +138,6 @@ class CreateUserPayload(ViewModel):
         "least one lowercase letter, one uppercase letter, one number, "
         "and one special character",
     )
-
-    @validator("password")
-    def validate_password(cls, v, values, **kwargs):
-        if not is_strong_password(v):
-            raise ValueError("Password is too weak.")
-
-        if v == values["email"]:
-            raise ValueError("Email and password should not match.")
 
     class Config:
         schema_extra = {
