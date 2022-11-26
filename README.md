@@ -9,6 +9,32 @@ experiment with new technology as well as some old favorites (FastAPI, Python, e
 - You're going to need
   - Python (3.11 at time of writing). I recommend `pyenv`.
   - `pip`
+  - A valid Firebase config at `src/firebase-credentials.json`
+
+# Firebase Configuration
+Create a new application in [Firebase](console.firebase.google.com).
+
+You will need both an API key as well as the Firebase admin credentials. Altogether the
+JSON should resemble the following:
+
+```JSON
+{
+    "api_key": "test_api_key",
+    "auth_provider_x509_cert_url": "www.test.test",
+    "auth_uri": "www.test.test",
+    "client_email": "test@nathanson.dev",
+    "client_id": "123456789123456789123",
+    "client_x509_cert_url": "www.test.test",
+    "private_key": "test_private_key",
+    "private_key_id": "test-key-id",
+    "project_id": "test-project-id-123",
+    "token_uri": "www.test.test",
+    "type": "service_account",
+}
+```
+
+Save this config to `src/firebase_credentials.json`. For security, these credentials
+should not be made publicly available.
 
 # Running the Server Locally
 Run `./run_server.sh`. You should see something like this:
