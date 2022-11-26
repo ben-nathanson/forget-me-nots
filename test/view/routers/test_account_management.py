@@ -26,7 +26,7 @@ def generate_strong_password() -> str:
     )
     number: str = str(random.randint(0, 9))
     special_character: str = random.choice(SPECIAL_CHARACTERS)
-    password_components: list[str] = (
+    password_components: list[str] = list(
         letters + uppercase_letter + lowercase_letter + number + special_character
     )
 
