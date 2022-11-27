@@ -117,13 +117,13 @@ class TestSwaggerOpenApiLogin(CreateAccountFixture):
             self.create_token_route, request_form
         )
         assert create_token_response.ok, create_token_response.status_code
-        access_token: str = create_token_response.json()["access_token"]
+        access_token: str = create_token_response.json()["accessToken"]
         headers: dict = {"Authorization": f"Bearer {access_token}"}
         validate_token_response: Response = self.client.get(
             self.validate_token_route, headers=headers
         )
         assert validate_token_response.ok, validate_token_response.status_code
-        assert validate_token_response.json()["token"] == access_token
+        assert validate_token_response.json()["accessToken"] == access_token
 
 
 # TODO this doesn't really belong in the view layer tests; it makes no requests.
