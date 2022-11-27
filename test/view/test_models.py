@@ -15,23 +15,16 @@ from src.view.models import (
 
 class TestCountryAbbreviation(unittest.TestCase):
     def test_raises_exception_if_no_string_is_passed(self):
-        with pytest.raises(HTTPException) as exception:
+        with pytest.raises(ValueError):
             CountryAbbreviation.validate(1)
-        assert exception.value.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
-        assert exception.value.detail == "Country abbreviation should be a string."
 
     def test_raises_exception_if_not_two_characters(self):
         invalid_lengths = [3, 4]
         for length in invalid_lengths:
             with self.subTest():
                 abbreviation = "A" * length
-                with pytest.raises(HTTPException) as exception:
+                with pytest.raises(ValueError):
                     CountryAbbreviation.validate(abbreviation)
-                assert exception.value.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
-                assert (
-                    exception.value.detail
-                    == "Country abbreviation should be no more than two characters."
-                )
 
 
 class TestConvertToCamelCase(unittest.TestCase):
@@ -61,14 +54,14 @@ class TestUpcomingHolidaysPayload(unittest.TestCase):
 
 class TestHolidayBasePayload(unittest.TestCase):
     def test_raises_not_implemented_for_unexpected_country(self):
-        nonexistent_country_codes = ["//", "??", "(("]
-        for country_alpha_2 in nonexistent_country_codes:
+        nonexistent_country_abbreviations = ["//", "??", "((", "GG"]
+        for country_abbreviation in nonexistent_country_abbreviations:
             with self.subTest():
-                with pytest.raises(HTTPException) as exception:
-                    HolidayBasePayload(country_abbreviation=country_alpha_2)
+                with pytest.raises(NotImplementedError):
+                    HolidayBasePayload(country_abbreviation=country_abbreviation)
 
     def test_constructs_class_successfully_for_expected_country(self):
         country_codes = ["US", "FR", "MX"]
-        for country_alpha_2 in country_codes:
+        for country_abbreviation in country_codes:
             with self.subTest():
-                HolidayBasePayload(country_abbreviation=country_alpha_2)
+                HolidayBasePayload(country_abbreviation=country_abbreviation)

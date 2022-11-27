@@ -1,6 +1,4 @@
-import random
 import secrets
-import string
 import unittest
 import uuid
 from http import HTTPStatus
@@ -12,28 +10,10 @@ from firebase_admin.auth import UserNotFoundError, UserRecord
 from requests import Response  # type: ignore
 
 from src.logic.services.account_management import (
-    SPECIAL_CHARACTERS,
     AccountManagementService,
+    generate_strong_password,
 )
 from src.main import app
-
-
-def generate_strong_password() -> str:
-    uppercase_letter: str = random.choice(string.ascii_uppercase)
-    lowercase_letter: str = random.choice(string.ascii_lowercase)
-    letters: str = "".join(
-        [random.choice(string.ascii_letters) for _ in range(random.randint(3, 5))]
-    )
-    number: str = str(random.randint(0, 9))
-    special_character: str = random.choice(SPECIAL_CHARACTERS)
-    password_components: list[str] = list(
-        letters + uppercase_letter + lowercase_letter + number + special_character
-    )
-
-    random.shuffle(password_components)
-
-    password: str = "".join(password_components)
-    return password
 
 
 class AccountManagementFixture(unittest.TestCase):

@@ -7,13 +7,19 @@ import pycountry
 from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, Field, root_validator
 
+from src.logic import holiday_engine
+from src.logic.services.account_management import generate_strong_password
+
 
 def _convert_to_camel_case(string: str) -> str:
     return humps.camelize(string)  # type: ignore
 
 
 EXAMPLE_EMAIL = f"ben+{str(uuid.uuid4())}@nathanson.dev"
-EXAMPLE_PASSWORD = "7yxM!CyRH"
+EXAMPLE_PASSWORD = generate_strong_password()
+SUPPORTED_COUNTRY_ABBREVIATIONS: list[str] = [
+    c.abbreviation for c in holiday_engine.get_supported_countries()
+]
 
 
 class ViewModel(BaseModel):
@@ -30,22 +36,19 @@ class CountryAbbreviation(str):
     @classmethod
     def validate(cls, v):
         if not isinstance(v, str):
-            raise HTTPException(
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail="Country abbreviation should be a string.",
-            )
+            raise ValueError("Country abbreviation should be a string.")
 
         if len(v) > 2:
-            raise HTTPException(
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail="Country abbreviation should be no more than two characters.",
+            raise ValueError(
+                "Country abbreviation should be no more than two characters."
             )
 
         country = pycountry.countries.get(alpha_2=v)
         if country is None:
-            raise HTTPException(
-                HTTPStatus.NOT_IMPLEMENTED, detail=f"'{v}' has not been implemented."
-            )
+            raise NotImplementedError(f"'{v}' has not been implemented.")
+
+        if country.alpha_2 not in SUPPORTED_COUNTRY_ABBREVIATIONS:
+            raise NotImplementedError(f"'{v}' has not been implemented.")
         return v
 
 
@@ -93,6 +96,10 @@ class HolidayBasePayload(ViewModel):
                 "date": dt.date(year=2022, month=9, day=5),
                 "countryAbbreviation": "US",
             }
+        }
+        json_encoders = {
+            CountryAbbreviation: lambda c: c,
+            dt.date: lambda d: str(d.isoformat()),
         }
 
 

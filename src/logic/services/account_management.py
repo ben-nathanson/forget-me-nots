@@ -1,4 +1,7 @@
 import json
+import random
+import secrets
+import string
 from dataclasses import dataclass
 from typing import Optional
 
@@ -95,3 +98,21 @@ class AccountManagementService:
             response_json["refreshToken"],
         )
         return session_token
+
+
+def generate_strong_password() -> str:
+    uppercase_letter: str = secrets.choice(string.ascii_uppercase)
+    lowercase_letter: str = secrets.choice(string.ascii_lowercase)
+    letters: str = "".join(
+        [secrets.choice(string.ascii_letters) for _ in range(secrets.randbelow(2) + 3)]
+    )
+    number: str = str(secrets.randbelow(10))
+    special_character: str = secrets.choice(SPECIAL_CHARACTERS)
+    password_components: list[str] = list(
+        letters + uppercase_letter + lowercase_letter + number + special_character
+    )
+
+    random.shuffle(password_components)
+
+    password: str = "".join(password_components)
+    return password

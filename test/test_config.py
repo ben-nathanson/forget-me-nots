@@ -6,15 +6,15 @@ from src.config import CredentialManager
 
 MOCK_CREDENTIALS: dict = {
     "api_key": "test_api_key",  # nosec
-    "auth_provider_x509_cert_url": "www.test.test",
-    "auth_uri": "www.test.test",
+    "auth_provider_x509_cert_url": "www.test-auth_provider_x509_cert_url.test",
+    "auth_uri": "www.test-auth_uri.test",
     "client_email": "test@nathanson.dev",
     "client_id": "123456789123456789123",
-    "client_x509_cert_url": "www.test.test",
+    "client_x509_cert_url": "www.test-client_x509_cert_url.test",
     "private_key": "test_private_key",  # nosec
     "private_key_id": "test-key-id",
     "project_id": "test-project-id-123",
-    "token_uri": "www.test.test",
+    "token_uri": "www.test-token_uri.test",
     "type": "service_account",
 }
 
