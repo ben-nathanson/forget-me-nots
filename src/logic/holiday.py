@@ -2,9 +2,27 @@ import datetime as dt
 from typing import Optional
 
 import holidays
-import pycountry  # noqa, Pycharm is confused
+import pycountry
 
 import src.logic.models as logic_models
+
+
+class ISOCountry:
+    alpha_2: str
+    alpha_3: str
+    flag: str
+    name: str
+    numeric: str
+
+    common_name: str | None
+    official_name: str | None
+
+
+# TODO switch to using this instead of leaking Holidays details
+class Country:
+    abbreviation: str
+    name: str
+    flag: str
 
 
 class HolidayEngine:
@@ -13,6 +31,10 @@ class HolidayEngine:
         self._cached_supported_countries: list[str] = list(
             holidays.list_supported_countries().keys()
         )
+        self._supported_countries: list[ISOCountry] = [
+            pycountry.countries.get(alpha_2=abbreviation)
+            for abbreviation in self._cached_supported_countries
+        ]
 
     def _get_cached_country_holidays(self, country_code: str) -> holidays.HolidayBase:
         cached_holidays: Optional[
@@ -20,10 +42,6 @@ class HolidayEngine:
         ] = self._country_holidays_cache.get(country_code, None)
 
         if cached_holidays is None:
-            # TODO this can raise NotImplemented because holidays doesn't support all
-            # countries in the pycountry db.
-            # Need to either update the CountryAbbreviation model to prevent this from
-            # getting past the route handler
             country_holidays = holidays.country_holidays(country_code)
             # primes holidays to actually fetch its list of holidays
             current_year: int = dt.date.today().year
@@ -37,16 +55,13 @@ class HolidayEngine:
         return cached_holidays
 
     def get_holiday_name(self, country_code: str, date: dt.date) -> str:
-        country_holidays = self._get_cached_country_holidays(country_code)
+        country_holidays: holidays.HolidayBase = self._get_cached_country_holidays(
+            country_code
+        )
         return country_holidays.get(date) if date in country_holidays else ""
 
-    # TODO define a custom model or find a way to get a better type hint from pycountry
-    def get_supported_countries(self) -> list:
-        supported_countries = [
-            pycountry.countries.get(alpha_2=abbreviation)
-            for abbreviation in self._cached_supported_countries
-        ]
-        return supported_countries
+    def get_supported_countries(self) -> list[ISOCountry]:
+        return self._supported_countries
 
     def get_upcoming_holidays(
         self, country_code: str, start: dt.date, end: dt.date

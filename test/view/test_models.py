@@ -61,7 +61,7 @@ class TestUpcomingHolidaysPayload(unittest.TestCase):
 
 class TestHolidayBasePayload(unittest.TestCase):
     def test_raises_not_implemented_for_unexpected_country(self):
-        nonexistent_country_codes = ["//", "??", "(("]
+        nonexistent_country_codes = ["//", "??", "((", "GG"]
         for country_alpha_2 in nonexistent_country_codes:
             with self.subTest():
                 with pytest.raises(HTTPException):

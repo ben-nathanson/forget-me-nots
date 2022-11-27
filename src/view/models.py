@@ -7,6 +7,7 @@ import pycountry
 from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, Field, root_validator
 
+from src.logic import holiday_engine
 from src.logic.services.account_management import generate_strong_password
 
 
@@ -16,6 +17,7 @@ def _convert_to_camel_case(string: str) -> str:
 
 EXAMPLE_EMAIL = f"ben+{str(uuid.uuid4())}@nathanson.dev"
 EXAMPLE_PASSWORD = generate_strong_password()
+SUPPORTED_COUNTRIES: list = holiday_engine.get_supported_countries()
 
 
 class ViewModel(BaseModel):
@@ -45,6 +47,11 @@ class CountryAbbreviation(str):
 
         country = pycountry.countries.get(alpha_2=v)
         if country is None:
+            raise HTTPException(
+                HTTPStatus.NOT_IMPLEMENTED, detail=f"'{v}' has not been implemented."
+            )
+
+        if country not in SUPPORTED_COUNTRIES:
             raise HTTPException(
                 HTTPStatus.NOT_IMPLEMENTED, detail=f"'{v}' has not been implemented."
             )
