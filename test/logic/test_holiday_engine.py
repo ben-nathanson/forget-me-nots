@@ -32,13 +32,13 @@ class TestGetHolidayName(unittest.TestCase):
 class TestGetSupportedCountries(unittest.TestCase):
     def test_returns_expected_country_detail(self):
         supported_countries = holiday_engine.get_supported_countries()
-        united_states, *_ = [c for c in supported_countries if c.alpha_2 == "US"]
+        united_states, *_ = [c for c in supported_countries if c.abbreviation == "US"]
         assert united_states.flag == "🇺🇸"
         assert united_states.name == "United States"
 
     def test_returns_expected_countries(self):
         supported_countries = holiday_engine.get_supported_countries()
-        supported_countries_set = {c.alpha_2 for c in supported_countries}
+        supported_countries_set = {c.abbreviation for c in supported_countries}
         assert {"GB", "MX", "US"}.intersection(supported_countries_set)
 
 

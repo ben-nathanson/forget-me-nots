@@ -1,5 +1,9 @@
 import datetime as dt
-from typing import Optional
+from dataclasses import dataclass
+from typing import (  # noqa PyCharm is not able to find Self, but it is there
+    Optional,
+    Self,
+)
 
 import holidays
 import pycountry
@@ -18,11 +22,15 @@ class ISOCountry:
     official_name: str | None
 
 
-# TODO switch to using this instead of leaking Holidays details
+@dataclass
 class Country:
     abbreviation: str
     name: str
     flag: str
+
+    @staticmethod
+    def parse_from_iso(iso_country: ISOCountry) -> Self:
+        return Country(iso_country.alpha_2, iso_country.name, iso_country.flag)
 
 
 class HolidayEngine:
@@ -31,8 +39,8 @@ class HolidayEngine:
         self._cached_supported_countries: list[str] = list(
             holidays.list_supported_countries().keys()
         )
-        self._supported_countries: list[ISOCountry] = [
-            pycountry.countries.get(alpha_2=abbreviation)
+        self._supported_countries: list[Country] = [
+            Country.parse_from_iso(pycountry.countries.get(alpha_2=abbreviation))
             for abbreviation in self._cached_supported_countries
         ]
 
@@ -60,7 +68,7 @@ class HolidayEngine:
         )
         return country_holidays.get(date) if date in country_holidays else ""
 
-    def get_supported_countries(self) -> list[ISOCountry]:
+    def get_supported_countries(self) -> list[Country]:
         return self._supported_countries
 
     def get_upcoming_holidays(

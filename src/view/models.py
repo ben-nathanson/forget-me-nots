@@ -17,7 +17,9 @@ def _convert_to_camel_case(string: str) -> str:
 
 EXAMPLE_EMAIL = f"ben+{str(uuid.uuid4())}@nathanson.dev"
 EXAMPLE_PASSWORD = generate_strong_password()
-SUPPORTED_COUNTRIES: list = holiday_engine.get_supported_countries()
+SUPPORTED_COUNTRY_ABBREVIATIONS: list[str] = [
+    c.abbreviation for c in holiday_engine.get_supported_countries()
+]
 
 
 class ViewModel(BaseModel):
@@ -34,27 +36,19 @@ class CountryAbbreviation(str):
     @classmethod
     def validate(cls, v):
         if not isinstance(v, str):
-            raise HTTPException(
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail="Country abbreviation should be a string.",
-            )
+            raise ValueError("Country abbreviation should be a string.")
 
         if len(v) > 2:
-            raise HTTPException(
-                HTTPStatus.UNPROCESSABLE_ENTITY,
-                detail="Country abbreviation should be no more than two characters.",
+            raise ValueError(
+                "Country abbreviation should be no more than two characters."
             )
 
         country = pycountry.countries.get(alpha_2=v)
         if country is None:
-            raise HTTPException(
-                HTTPStatus.NOT_IMPLEMENTED, detail=f"'{v}' has not been implemented."
-            )
+            raise NotImplementedError(f"'{v}' has not been implemented.")
 
-        if country not in SUPPORTED_COUNTRIES:
-            raise HTTPException(
-                HTTPStatus.NOT_IMPLEMENTED, detail=f"'{v}' has not been implemented."
-            )
+        if country.alpha_2 not in SUPPORTED_COUNTRY_ABBREVIATIONS:
+            raise NotImplementedError(f"'{v}' has not been implemented.")
         return v
 
 
