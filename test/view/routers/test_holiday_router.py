@@ -108,7 +108,6 @@ class TestUpcomingHolidays(unittest.TestCase):
         payload = view_models.UpcomingHolidaysPayload(
             country_abbreviation="US",
             start_date=dt.date(year=2022, month=12, day=23),
-            # TODO suspect there's a boundary issue with the engine
             end_date=dt.date(year=2022, month=12, day=26),
         )
         raw_response = self.get_response(payload).json()
