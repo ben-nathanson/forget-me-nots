@@ -44,7 +44,7 @@ def login(payload: view_models.LoginPayload):
 
 
 @account_management_router.post("/token")
-async def token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
     session_token: SessionToken = account_management_service.login(
         form_data.username, form_data.password
     )
