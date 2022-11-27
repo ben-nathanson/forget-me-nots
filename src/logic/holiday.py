@@ -1,9 +1,7 @@
 import datetime as dt
 from dataclasses import dataclass
-from typing import (  # noqa PyCharm is not able to find Self, but it is there
-    Optional,
-    Self,
-)
+from typing import Self  # noqa PyCharm is not able to find Self, but it is there
+from typing import Optional
 
 import holidays
 import pycountry
