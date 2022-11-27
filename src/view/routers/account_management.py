@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 import src.view.models as view_models
 from src.logic.services.account_management import (
@@ -6,6 +7,8 @@ from src.logic.services.account_management import (
     AuthenticationError,
     SessionToken,
 )
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/token")
 
 account_management_router = APIRouter(prefix="/users", tags=["users"])
 
@@ -30,11 +33,24 @@ def login(payload: view_models.LoginPayload):
         session_token: SessionToken = account_management_service.login(
             payload.email, payload.password
         )
-        return view_models.LoginResponse(
-            email=session_token.email,
-            expires_in=session_token.expires_in,
-            id_token=session_token.id_token,
-            access_token=session_token.access_token,
-        )
     except AuthenticationError as error:
         raise HTTPException(status_code=403, detail=str(error))
+    return view_models.LoginResponse(
+        email=session_token.email,
+        expires_in=session_token.expires_in,
+        id_token=session_token.id_token,
+        access_token=session_token.access_token,
+    )
+
+
+@account_management_router.post("/token")
+async def token(form_data: OAuth2PasswordRequestForm = Depends()):
+    session_token: SessionToken = account_management_service.login(
+        form_data.username, form_data.password
+    )
+    return {"access_token": session_token.access_token, "token_type": "bearer"}
+
+
+@account_management_router.get("/validate-oauth-token")
+async def validate_oauth_token(token: str = Depends(oauth2_scheme)):
+    return {"token": token}
