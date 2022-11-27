@@ -97,6 +97,10 @@ class HolidayBasePayload(ViewModel):
                 "countryAbbreviation": "US",
             }
         }
+        json_encoders = {
+            CountryAbbreviation: lambda c: c,
+            dt.date: lambda d: str(d.isoformat()),
+        }
 
 
 class IsHolidayResponse(ViewModel):

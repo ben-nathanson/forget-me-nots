@@ -1,12 +1,6 @@
 import datetime as dt
+import json
 import unittest
-
-# TODO this would be a better approach than crafting raw payload dictionaries
-# class ComplexEncoder(json.JSONEncoder):
-#     def default(self, obj: Any):
-#         if isinstance(obj, dt.date):
-#             return obj.strftime(view_models.DATE_FORMAT)
-#         return json.JSONEncoder.default(self, obj)
 from test.logic.test_data import US_INDEPENDENCE_DAY
 
 from fastapi.testclient import TestClient
@@ -22,11 +16,9 @@ class TestIsItAHoliday(unittest.TestCase):
         self.route: str = "holidays/is-it-a-holiday"
 
     def get_response(self, payload: view_models.HolidayBasePayload) -> Response:
-        raw_payload: dict = {
-            "countryAbbreviation": payload.country_abbreviation,
-            "date": payload.date.isoformat(),
-        }
-        return self.client.post(self.route, json=raw_payload)
+        return self.client.post(
+            self.route, json=json.loads(payload.json(by_alias=True))
+        )
 
     def test_returns_expected_response(self):
         param_list = [
