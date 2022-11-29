@@ -38,7 +38,7 @@ class AccountManagementService:
         self._auth_service = auth_service or firebase_auth
         self._credential_manager = credential_service or CredentialManager()
 
-    def create_user(self, email: str, password: str):
+    def create_user(self, email: str, password: str) -> None:
         if email == password:
             raise ValueError("Email and password should not match.")
 
@@ -77,7 +77,7 @@ class AccountManagementService:
             f"https://www.googleapis.com/identitytoolkit/v3/relyingparty"
             f"/verifyPassword?key={self._credential_manager.get_firebase_api_key()}"
         )
-        headers = {"content-type": "application/json; charset=UTF-8"}
+        headers: dict = {"content-type": "application/json; charset=UTF-8"}
         request_body = json.dumps(
             {
                 "email": email,
