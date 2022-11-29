@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
+from fastapi.responses import PlainTextResponse
 from firebase_admin import App, initialize_app
-from starlette.responses import PlainTextResponse
 
 from src.config import CredentialManager
 from src.view.routers.account_management_router import account_management_router
