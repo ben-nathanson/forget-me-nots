@@ -4,8 +4,8 @@ from firebase_admin import App, initialize_app
 from starlette.responses import PlainTextResponse
 
 from src.config import CredentialManager
-from src.view.routers.account_management import account_management_router
-from src.view.routers.holiday import holiday_router
+from src.view.routers.account_management_router import account_management_router
+from src.view.routers.holiday_router import holiday_router
 
 credential_manager = CredentialManager()
 firebase_app: App = initialize_app(credential_manager.get_firebase_cert())
