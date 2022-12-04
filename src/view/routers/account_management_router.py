@@ -57,8 +57,13 @@ async def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @account_management_router.get(
-    "/verify-token", response_model=view_models.IdTokenResponse
+    "/verify-token",
+    response_model=view_models.IdTokenResponse,
+    responses={403: {"description": "Authentication error."}},
 )
 async def verify_oauth_token(id_token: str = Depends(oauth2_scheme)):
-    account_management_service.verify_token_and_get_user(id_token)
-    return view_models.IdTokenResponse(id_token=id_token)
+    try:
+        account_management_service.verify_token_and_get_user(id_token)
+        return view_models.IdTokenResponse(id_token=id_token)
+    except AuthenticationError as error:
+        raise HTTPException(status_code=403, detail=str(error))

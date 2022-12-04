@@ -109,10 +109,15 @@ class AccountManagementService:
         # https://github.com/firebase/firebase-admin-python/issues/624
         # https://github.com/firebase/firebase-admin-python/issues/625
         time.sleep(3)
-        jwt: dict = self._auth_service.verify_id_token(id_token, check_revoked=True)
-        email: str = jwt["email"]
-        user: firebase_auth.UserRecord = self._auth_service.get_user_by_email(email)
-        return user
+        try:
+            jwt: dict = self._auth_service.verify_id_token(id_token, check_revoked=True)
+            email: str = jwt["email"]
+            user: firebase_auth.UserRecord = self._auth_service.get_user_by_email(email)
+            return user
+        except firebase_auth.ExpiredIdTokenError:
+            raise AuthenticationError
+        except firebase_auth.RevokedIdTokenError:
+            raise AuthenticationError
 
 
 def generate_strong_password() -> str:

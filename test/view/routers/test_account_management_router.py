@@ -158,4 +158,4 @@ class TestLogout(AccountManagementBaseFixture):
         second_verification: Response = self.client.get(
             self.Routes.verify_token_route, headers=headers
         )
-        assert second_verification.status_code == 500
+        assert second_verification.status_code == 403
