@@ -114,9 +114,7 @@ class AccountManagementService:
             email: str = jwt["email"]
             user: firebase_auth.UserRecord = self._auth_service.get_user_by_email(email)
             return user
-        except firebase_auth.ExpiredIdTokenError:
-            raise AuthenticationError
-        except firebase_auth.RevokedIdTokenError:
+        except (firebase_auth.ExpiredIdTokenError, firebase_auth.RevokedIdTokenError):
             raise AuthenticationError
 
 
