@@ -45,6 +45,12 @@ class AccountManagementBaseFixture(unittest.TestCase):
             pass
 
 
+class CreateUserFixture(AccountManagementBaseFixture):
+    def setUp(self):
+        super().setUp()
+        self.create_user()
+
+
 class TestCreateUser(AccountManagementBaseFixture):
     def test_that_we_can_create_a_user(self):
         raw_payload: dict = {"email": self.email_address, "password": self.password}
@@ -86,11 +92,7 @@ class TestCreateUser(AccountManagementBaseFixture):
                 assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
-class TestLogin(AccountManagementBaseFixture):
-    def setUp(self):
-        super().setUp()
-        self.create_user()
-
+class TestLogin(CreateUserFixture):
     def test_that_we_can_login(self):
         response: Response = self.login()
         response_json: dict = response.json()
@@ -117,11 +119,7 @@ class TestLogin(AccountManagementBaseFixture):
                 assert response.status_code == HTTPStatus.FORBIDDEN
 
 
-class TestSwaggerOpenApiLogin(AccountManagementBaseFixture):
-    def setUp(self):
-        super().setUp()
-        self.create_user()
-
+class TestSwaggerOpenApiLogin(CreateUserFixture):
     def test_that_we_can_create_a_valid_token(self):
         request_form = {"username": self.email_address, "password": self.password}
         create_token_response: Response = self.client.post(
@@ -141,11 +139,7 @@ class TestSwaggerOpenApiLogin(AccountManagementBaseFixture):
         assert validate_token_response.json()["idToken"] == id_token
 
 
-class TestLogout(AccountManagementBaseFixture):
-    def setUp(self):
-        super().setUp()
-        self.create_user()
-
+class TestLogout(CreateUserFixture):
     def test_that_we_can_logout(self):
         login_response: Response = self.login()
         id_token: str = login_response.json()["idToken"]
