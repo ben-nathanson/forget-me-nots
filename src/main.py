@@ -1,3 +1,4 @@
+import uvicorn
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import PlainTextResponse
@@ -17,3 +18,7 @@ app.include_router(account_management_router)
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(_, validation_error: RequestValidationError):
     return PlainTextResponse(str(validation_error), status_code=422)
+
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=8000)
