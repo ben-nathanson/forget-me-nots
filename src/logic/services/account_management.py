@@ -22,8 +22,8 @@ class AuthenticationError(Exception):
 class SessionToken:
     email: str
     expires_in: int
-    id_token: str
-    access_token: str
+    id_token: str  # short-lived JSON web token (JWT)
+    access_token: str  # long-lived, used to fetch more id tokens, a.k.a. refresh token
 
 
 class AccountManagementService:
@@ -98,6 +98,9 @@ class AccountManagementService:
             response_json["refreshToken"],
         )
         return session_token
+
+    def logout(self, access_token: str):
+        ...
 
 
 def generate_strong_password() -> str:

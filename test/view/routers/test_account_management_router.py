@@ -131,15 +131,15 @@ class TestSwaggerOpenApiLogin(AccountManagementBaseFixture):
         assert (
             create_token_response.status_code == 200
         ), create_token_response.status_code
-        access_token: str = create_token_response.json()["accessToken"]
-        headers: dict = {"Authorization": f"Bearer {access_token}"}
+        id_token: str = create_token_response.json()["idToken"]
+        headers: dict = {"Authorization": f"Bearer {id_token}"}
         validate_token_response: Response = self.client.get(
             self.Routes.validate_token_route, headers=headers
         )
         assert (
             create_token_response.status_code == 200
         ), validate_token_response.status_code
-        assert validate_token_response.json()["accessToken"] == access_token
+        assert validate_token_response.json()["idToken"] == id_token
 
 
 class TestLogout(AccountManagementBaseFixture):
@@ -154,7 +154,7 @@ class TestLogout(AccountManagementBaseFixture):
         )
         return validate_token_response.status_code == 200
 
-    @pytest.mark.skip("Not implemented")
+    @pytest.mark.skip
     def test_that_we_can_logout(self):
         login_response: Response = self.login()
         access_token: str = login_response.json()["accessToken"]

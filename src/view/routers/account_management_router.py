@@ -43,18 +43,21 @@ def login(payload: view_models.LoginPayload):
     )
 
 
-@account_management_router.post(
-    "/token", response_model=view_models.CreateTokenResponse
-)
+@account_management_router.post("/logout")
+def logout(id_token: str = Depends(oauth2_scheme)):
+    account_management_service.logout(id_token)
+
+
+@account_management_router.post("/token", response_model=view_models.IdTokenResponse)
 async def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
     session_token: SessionToken = account_management_service.login(
         form_data.username, form_data.password
     )
-    return view_models.CreateTokenResponse(access_token=session_token.access_token)
+    return view_models.IdTokenResponse(id_token=session_token.id_token)
 
 
 @account_management_router.get(
-    "/validate-oauth-token", response_model=view_models.ValidateTokenResponse
+    "/validate-oauth-token", response_model=view_models.IdTokenResponse
 )
-async def validate_oauth_token(access_token: str = Depends(oauth2_scheme)):
-    return view_models.ValidateTokenResponse(access_token=access_token)
+async def validate_oauth_token(id_token: str = Depends(oauth2_scheme)):
+    return view_models.IdTokenResponse(id_token=id_token)

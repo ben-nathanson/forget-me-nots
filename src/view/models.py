@@ -165,14 +165,12 @@ class LoginPayload(ViewModel):
 class LoginResponse(ViewModel):
     email: EmailStr
     expires_in: int
-    id_token: str
-    access_token: str
+    id_token: str = Field(description="Short-lived JSON web token (JWT).")
+    access_token: str = Field(
+        description="Long-lived token. Used to fetch more id "
+        "tokens. Also known as a refresh token."
+    )
 
 
-class CreateTokenResponse(ViewModel):
-    access_token: str
-    token_type: str = "bearer"
-
-
-class ValidateTokenResponse(ViewModel):
-    access_token: str
+class IdTokenResponse(ViewModel):
+    id_token: str = Field(description="Short-lived JSON web token (JWT).")
