@@ -111,13 +111,17 @@ class TestSwaggerOpenApiLogin(CreateAccountFixture):
     def test_that_we_can_create_a_valid_token(self):
         request_form = {"username": self.email_address, "password": self.password}
         create_token_response: Response = self.client.post(
-            self.create_token_route, request_form
+            self.create_token_route, data=request_form
         )
-        assert create_token_response.ok, create_token_response.status_code
+        assert (
+            create_token_response.status_code == 200
+        ), create_token_response.status_code
         access_token: str = create_token_response.json()["accessToken"]
         headers: dict = {"Authorization": f"Bearer {access_token}"}
         validate_token_response: Response = self.client.get(
             self.validate_token_route, headers=headers
         )
-        assert validate_token_response.ok, validate_token_response.status_code
+        assert (
+            create_token_response.status_code == 200
+        ), validate_token_response.status_code
         assert validate_token_response.json()["accessToken"] == access_token
