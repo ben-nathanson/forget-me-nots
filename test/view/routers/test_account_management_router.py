@@ -4,6 +4,7 @@ import uuid
 from http import HTTPStatus
 
 import firebase_admin.auth
+import pytest
 from fastapi.testclient import TestClient
 from firebase_admin import auth
 from firebase_admin.auth import UserNotFoundError, UserRecord
@@ -14,16 +15,28 @@ from src.main import app
 
 
 class AccountManagementBaseFixture(unittest.TestCase):
-    create_route: str = "users/create"
-    login_route: str = "users/login"
-    create_token_route: str = "/users/token"
-    validate_token_route: str = "/users/validate-oauth-token"
+    class Routes:
+        create_route: str = "users/create"
+        create_token_route: str = "/users/token"
+        login_route: str = "users/login"
+        logout_route: str = "users/logout"
+        validate_token_route: str = "/users/validate-oauth-token"
+
     random_guid = str(uuid.uuid4())
     email_address: str = f"ben+automatedtesting+{random_guid}@nathanson.dev"
     password: str = generate_strong_password()
 
     def setUp(self):  # noqa
         self.client: TestClient = TestClient(app)
+
+    def create_user(self) -> Response:
+        raw_payload: dict = {"email": self.email_address, "password": self.password}
+        return self.client.post(self.Routes.create_route, json=raw_payload)
+
+    def login(self) -> Response:
+        raw_payload: dict = {"email": self.email_address, "password": self.password}
+        response: Response = self.client.post(self.Routes.login_route, json=raw_payload)
+        return response
 
     def tearDown(self):  # noqa
         try:
@@ -33,17 +46,12 @@ class AccountManagementBaseFixture(unittest.TestCase):
             pass
 
 
-class CreateAccountFixture(AccountManagementBaseFixture):
-    def setUp(self):
-        super().setUp()
-        raw_payload: dict = {"email": self.email_address, "password": self.password}
-        self.client.post(self.create_route, json=raw_payload)
-
-
 class TestCreateUser(AccountManagementBaseFixture):
     def test_that_we_can_create_a_user(self):
         raw_payload: dict = {"email": self.email_address, "password": self.password}
-        response: Response = self.client.post(self.create_route, json=raw_payload)
+        response: Response = self.client.post(
+            self.Routes.create_route, json=raw_payload
+        )
         assert response.status_code == 200, (self.email_address, self.password)
         assert firebase_admin.auth.get_user_by_email(self.email_address)
 
@@ -58,7 +66,7 @@ class TestCreateUser(AccountManagementBaseFixture):
                 raw_payload: dict = {"email": email, "password": password}
 
                 response: Response = self.client.post(
-                    self.create_route, json=raw_payload
+                    self.Routes.create_route, json=raw_payload
                 )
                 assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY, password
 
@@ -74,15 +82,18 @@ class TestCreateUser(AccountManagementBaseFixture):
                 raw_payload: dict = {"email": email, "password": password}
 
                 response: Response = self.client.post(
-                    self.create_route, json=raw_payload
+                    self.Routes.create_route, json=raw_payload
                 )
                 assert response.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
 
 
-class TestLogin(CreateAccountFixture):
+class TestLogin(AccountManagementBaseFixture):
+    def setUp(self):
+        super().setUp()
+        self.create_user()
+
     def test_that_we_can_login(self):
-        raw_payload: dict = {"email": self.email_address, "password": self.password}
-        response: Response = self.client.post(self.login_route, json=raw_payload)
+        response: Response = self.login()
         response_json: dict = response.json()
 
         assert response.status_code == 200, (self.email_address, self.password)
@@ -102,16 +113,20 @@ class TestLogin(CreateAccountFixture):
             with self.subTest():
                 raw_payload: dict = {"email": self.email_address, "password": password}
                 response: Response = self.client.post(
-                    self.login_route, json=raw_payload
+                    self.Routes.login_route, json=raw_payload
                 )
                 assert response.status_code == HTTPStatus.FORBIDDEN
 
 
-class TestSwaggerOpenApiLogin(CreateAccountFixture):
+class TestSwaggerOpenApiLogin(AccountManagementBaseFixture):
+    def setUp(self):
+        super().setUp()
+        self.create_user()
+
     def test_that_we_can_create_a_valid_token(self):
         request_form = {"username": self.email_address, "password": self.password}
         create_token_response: Response = self.client.post(
-            self.create_token_route, data=request_form
+            self.Routes.create_token_route, data=request_form
         )
         assert (
             create_token_response.status_code == 200
@@ -119,9 +134,21 @@ class TestSwaggerOpenApiLogin(CreateAccountFixture):
         access_token: str = create_token_response.json()["accessToken"]
         headers: dict = {"Authorization": f"Bearer {access_token}"}
         validate_token_response: Response = self.client.get(
-            self.validate_token_route, headers=headers
+            self.Routes.validate_token_route, headers=headers
         )
         assert (
             create_token_response.status_code == 200
         ), validate_token_response.status_code
         assert validate_token_response.json()["accessToken"] == access_token
+
+
+class TestLogout(AccountManagementBaseFixture):
+    def setUp(self):
+        super().setUp()
+        self.create_user()
+
+    @pytest.mark.skip("Not implemented")
+    def test_that_we_can_logout(self):
+        raw_payload: dict = {"email": self.email_address, "password": self.password}
+        response: Response = self.client.post(self.Routes.login_route, json=raw_payload)
+        response_json: dict = response.json()
