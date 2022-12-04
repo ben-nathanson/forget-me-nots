@@ -167,3 +167,12 @@ class LoginResponse(ViewModel):
     expires_in: int
     id_token: str
     access_token: str
+
+
+class CreateTokenResponse(ViewModel):
+    access_token: str
+    token_type: str = "bearer"
+
+
+class ValidateTokenResponse(ViewModel):
+    access_token: str
