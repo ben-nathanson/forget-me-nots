@@ -2,6 +2,7 @@ import json
 import random
 import secrets
 import string
+import time
 from dataclasses import dataclass
 from typing import Optional
 
@@ -99,8 +100,16 @@ class AccountManagementService:
         )
         return session_token
 
-    def logout(self, access_token: str):
+    def logout(self, id_token: str):
         ...
+
+    def verify_token_and_get_user(self, id_token: str):
+        # TODO this is an unfortunate hack while I wait for this issue to be resolved
+        # https://github.com/firebase/firebase-admin-python/issues/624
+        # https://github.com/firebase/firebase-admin-python/issues/625
+        time.sleep(3)
+        user: dict = self._auth_service.verify_id_token(id_token)
+        return user
 
 
 def generate_strong_password() -> str:

@@ -57,7 +57,8 @@ async def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
 
 
 @account_management_router.get(
-    "/validate-oauth-token", response_model=view_models.IdTokenResponse
+    "/verify-token", response_model=view_models.IdTokenResponse
 )
-async def validate_oauth_token(id_token: str = Depends(oauth2_scheme)):
+async def verify_oauth_token(id_token: str = Depends(oauth2_scheme)):
+    account_management_service.verify_token_and_get_user(id_token)
     return view_models.IdTokenResponse(id_token=id_token)

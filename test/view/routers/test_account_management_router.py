@@ -20,7 +20,7 @@ class AccountManagementBaseFixture(unittest.TestCase):
         create_token_route: str = "/users/token"
         login_route: str = "users/login"
         logout_route: str = "users/logout"
-        validate_token_route: str = "/users/validate-oauth-token"
+        verify_token_route: str = "/users/verify-token"
 
     random_guid = str(uuid.uuid4())
     email_address: str = f"ben+automatedtesting+{random_guid}@nathanson.dev"
@@ -134,7 +134,7 @@ class TestSwaggerOpenApiLogin(AccountManagementBaseFixture):
         id_token: str = create_token_response.json()["idToken"]
         headers: dict = {"Authorization": f"Bearer {id_token}"}
         validate_token_response: Response = self.client.get(
-            self.Routes.validate_token_route, headers=headers
+            self.Routes.verify_token_route, headers=headers
         )
         assert (
             create_token_response.status_code == 200
@@ -147,21 +147,21 @@ class TestLogout(AccountManagementBaseFixture):
         super().setUp()
         self.create_user()
 
-    def is_valid_token(self, access_token: str) -> bool:
-        headers: dict = {"Authorization": f"Bearer {access_token}"}
+    def is_valid_token(self, id_token: str) -> bool:
+        headers: dict = {"Authorization": f"Bearer {id_token}"}
         validate_token_response: Response = self.client.get(
-            self.Routes.validate_token_route, headers=headers
+            self.Routes.verify_token_route, headers=headers
         )
         return validate_token_response.status_code == 200
 
     @pytest.mark.skip
     def test_that_we_can_logout(self):
         login_response: Response = self.login()
-        access_token: str = login_response.json()["accessToken"]
-        assert self.is_valid_token(access_token)
-        headers: dict = {"Authorization": f"Bearer {access_token}"}
+        id_token: str = login_response.json()["idToken"]
+        assert self.is_valid_token(id_token)
+        headers: dict = {"Authorization": f"Bearer {id_token}"}
         logout_response: Response = self.client.post(
             self.Routes.logout_route, headers=headers
         )
         assert logout_response.status_code == 200
-        assert not self.is_valid_token(access_token)
+        assert not self.is_valid_token(id_token)
