@@ -108,7 +108,8 @@ class AccountManagementService:
         # https://github.com/firebase/firebase-admin-python/issues/624
         # https://github.com/firebase/firebase-admin-python/issues/625
         time.sleep(3)
-        user: dict = self._auth_service.verify_id_token(id_token)
+        email: dict = self._auth_service.verify_id_token(id_token)["email"]
+        user: firebase_auth.UserRecord = self._auth_service.get_user_by_email(email)
         return user
 
 
