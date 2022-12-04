@@ -147,8 +147,21 @@ class TestLogout(AccountManagementBaseFixture):
         super().setUp()
         self.create_user()
 
+    def is_valid_token(self, access_token: str) -> bool:
+        headers: dict = {"Authorization": f"Bearer {access_token}"}
+        validate_token_response: Response = self.client.get(
+            self.Routes.validate_token_route, headers=headers
+        )
+        return validate_token_response.status_code == 200
+
     @pytest.mark.skip("Not implemented")
     def test_that_we_can_logout(self):
-        raw_payload: dict = {"email": self.email_address, "password": self.password}
-        response: Response = self.client.post(self.Routes.login_route, json=raw_payload)
-        response_json: dict = response.json()
+        login_response: Response = self.login()
+        access_token: str = login_response.json()["accessToken"]
+        assert self.is_valid_token(access_token)
+        headers: dict = {"Authorization": f"Bearer {access_token}"}
+        logout_response: Response = self.client.post(
+            self.Routes.logout_route, headers=headers
+        )
+        assert logout_response.status_code == 200
+        assert not self.is_valid_token(access_token)
