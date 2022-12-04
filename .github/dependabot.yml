@@ -10,3 +10,8 @@ updates:
     schedule:
       interval: "monthly"
     open-pull-requests-limit: 5
+    commit-message:
+      # Prefix all commit messages with "[skip ci]" to skip running tests, which will
+      # fail because the Dependabot GitHub actor does not have access to secrets which
+      # are necessary for running tests.
+      prefix: "[skip ci]"
