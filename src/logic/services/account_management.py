@@ -101,14 +101,16 @@ class AccountManagementService:
         return session_token
 
     def logout(self, id_token: str):
-        ...
+        user: firebase_auth.UserRecord = self.verify_token_and_get_user(id_token)
+        self._auth_service.revoke_refresh_tokens(user.uid)
 
     def verify_token_and_get_user(self, id_token: str):
         # TODO this is an unfortunate hack while I wait for this issue to be resolved
         # https://github.com/firebase/firebase-admin-python/issues/624
         # https://github.com/firebase/firebase-admin-python/issues/625
         time.sleep(3)
-        email: dict = self._auth_service.verify_id_token(id_token)["email"]
+        jwt: dict = self._auth_service.verify_id_token(id_token, check_revoked=True)
+        email: str = jwt["email"]
         user: firebase_auth.UserRecord = self._auth_service.get_user_by_email(email)
         return user
 

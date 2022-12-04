@@ -4,7 +4,6 @@ import uuid
 from http import HTTPStatus
 
 import firebase_admin.auth
-import pytest
 from fastapi.testclient import TestClient
 from firebase_admin import auth
 from firebase_admin.auth import UserNotFoundError, UserRecord
@@ -27,7 +26,7 @@ class AccountManagementBaseFixture(unittest.TestCase):
     password: str = generate_strong_password()
 
     def setUp(self):  # noqa
-        self.client: TestClient = TestClient(app)
+        self.client: TestClient = TestClient(app, raise_server_exceptions=False)
 
     def create_user(self) -> Response:
         raw_payload: dict = {"email": self.email_address, "password": self.password}
@@ -147,21 +146,16 @@ class TestLogout(AccountManagementBaseFixture):
         super().setUp()
         self.create_user()
 
-    def is_valid_token(self, id_token: str) -> bool:
-        headers: dict = {"Authorization": f"Bearer {id_token}"}
-        validate_token_response: Response = self.client.get(
-            self.Routes.verify_token_route, headers=headers
-        )
-        return validate_token_response.status_code == 200
-
-    @pytest.mark.skip
     def test_that_we_can_logout(self):
         login_response: Response = self.login()
         id_token: str = login_response.json()["idToken"]
-        assert self.is_valid_token(id_token)
         headers: dict = {"Authorization": f"Bearer {id_token}"}
-        logout_response: Response = self.client.post(
-            self.Routes.logout_route, headers=headers
+        first_verification: Response = self.client.get(
+            self.Routes.verify_token_route, headers=headers
         )
-        assert logout_response.status_code == 200
-        assert not self.is_valid_token(id_token)
+        assert first_verification.status_code == 200
+        self.client.post(self.Routes.logout_route, headers=headers)
+        second_verification: Response = self.client.get(
+            self.Routes.verify_token_route, headers=headers
+        )
+        assert second_verification.status_code == 500
