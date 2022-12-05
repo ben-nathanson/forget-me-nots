@@ -48,12 +48,18 @@ def logout(id_token: str = Depends(oauth2_scheme)):
     account_management_service.logout(id_token)
 
 
-@account_management_router.post("/token", response_model=view_models.IdTokenResponse)
+@account_management_router.post(
+    "/token", response_model=view_models.Rfc6749TokenResponse
+)
 async def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
     session_token: SessionToken = account_management_service.login(
         form_data.username, form_data.password
     )
-    return view_models.IdTokenResponse(id_token=session_token.id_token)
+    return view_models.Rfc6749TokenResponse(
+        access_token=session_token.id_token,
+        refresh_token=session_token.access_token,
+        expires_in=session_token.expires_in,
+    )
 
 
 @account_management_router.get(
