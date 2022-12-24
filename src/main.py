@@ -16,7 +16,7 @@ app.include_router(account_management_router)
 
 
 @app.exception_handler(RequestValidationError)
-async def validation_exception_handler(_, validation_error: RequestValidationError):
+def validation_exception_handler(_, validation_error: RequestValidationError):
     return PlainTextResponse(str(validation_error), status_code=422)
 
 

@@ -51,7 +51,7 @@ def logout(id_token: str = Depends(oauth2_scheme)):
 @account_management_router.post(
     "/token", response_model=view_models.Rfc6749TokenResponse
 )
-async def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
+def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
     session_token: SessionToken = account_management_service.login(
         form_data.username, form_data.password
     )
@@ -67,7 +67,7 @@ async def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
     response_model=view_models.IdTokenResponse,
     responses={403: {"description": "Authentication error."}},
 )
-async def verify_oauth_token(id_token: str = Depends(oauth2_scheme)):
+def verify_oauth_token(id_token: str = Depends(oauth2_scheme)):
     try:
         account_management_service.verify_token_and_get_user(id_token)
         return view_models.IdTokenResponse(id_token=id_token)
