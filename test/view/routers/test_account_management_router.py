@@ -128,7 +128,7 @@ class TestSwaggerOpenApiLogin(CreateUserFixture):
         assert (
             create_token_response.status_code == 200
         ), create_token_response.status_code
-        id_token: str = create_token_response.json()["idToken"]
+        id_token: str = create_token_response.json()["access_token"]
         headers: dict = {"Authorization": f"Bearer {id_token}"}
         validate_token_response: Response = self.client.get(
             self.Routes.verify_token_route, headers=headers
