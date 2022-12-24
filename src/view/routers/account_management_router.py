@@ -43,18 +43,33 @@ def login(payload: view_models.LoginPayload):
     )
 
 
+@account_management_router.post("/logout")
+def logout(id_token: str = Depends(oauth2_scheme)):
+    account_management_service.logout(id_token)
+
+
 @account_management_router.post(
-    "/token", response_model=view_models.CreateTokenResponse
+    "/token", response_model=view_models.Rfc6749TokenResponse
 )
-async def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
+def create_token(form_data: OAuth2PasswordRequestForm = Depends()):
     session_token: SessionToken = account_management_service.login(
         form_data.username, form_data.password
     )
-    return view_models.CreateTokenResponse(access_token=session_token.access_token)
+    return view_models.Rfc6749TokenResponse(
+        access_token=session_token.id_token,
+        refresh_token=session_token.access_token,
+        expires_in=session_token.expires_in,
+    )
 
 
 @account_management_router.get(
-    "/validate-oauth-token", response_model=view_models.ValidateTokenResponse
+    "/verify-token",
+    response_model=view_models.IdTokenResponse,
+    responses={403: {"description": "Authentication error."}},
 )
-async def validate_oauth_token(access_token: str = Depends(oauth2_scheme)):
-    return view_models.ValidateTokenResponse(access_token=access_token)
+def verify_oauth_token(id_token: str = Depends(oauth2_scheme)):
+    try:
+        account_management_service.verify_token_and_get_user(id_token)
+        return view_models.IdTokenResponse(id_token=id_token)
+    except AuthenticationError as error:
+        raise HTTPException(status_code=403, detail=str(error))

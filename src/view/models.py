@@ -165,14 +165,30 @@ class LoginPayload(ViewModel):
 class LoginResponse(ViewModel):
     email: EmailStr
     expires_in: int
-    id_token: str
-    access_token: str
+    id_token: str = Field(description="Short-lived JSON web token (JWT).")
+    access_token: str = Field(
+        description="Long-lived token. Used to fetch more id "
+        "tokens. Also known as a refresh token."
+    )
 
 
-class CreateTokenResponse(ViewModel):
-    access_token: str
+class IdTokenResponse(ViewModel):
+    id_token: str = Field(description="Short-lived JSON web token (JWT).")
+
+
+class Rfc6749TokenResponse(BaseModel):
+    """
+    This is a model that respects https://www.rfc-editor.org/rfc/rfc6749#section-4.1.4.
+
+    For that reason, we use snake_case field names.
+
+    Also, the notion Swagger docs has of access_token is how the rest of the
+    application treats id_token. TODO maybe using the wrong auth schema here?
+    """
+
+    access_token: str = Field(description="Short-lived JSON web token (JWT).")
+    refresh_token: str = Field(
+        default="", description="Long lived token used to " "fetch more access tokens."
+    )
+    expires_in: int
     token_type: str = "bearer"
-
-
-class ValidateTokenResponse(ViewModel):
-    access_token: str

@@ -2,6 +2,7 @@ import json
 import random
 import secrets
 import string
+import time
 from dataclasses import dataclass
 from typing import Optional
 
@@ -22,8 +23,8 @@ class AuthenticationError(Exception):
 class SessionToken:
     email: str
     expires_in: int
-    id_token: str
-    access_token: str
+    id_token: str  # short-lived JSON web token (JWT)
+    access_token: str  # long-lived, used to fetch more id tokens, a.k.a. refresh token
 
 
 class AccountManagementService:
@@ -98,6 +99,23 @@ class AccountManagementService:
             response_json["refreshToken"],
         )
         return session_token
+
+    def logout(self, id_token: str):
+        user: firebase_auth.UserRecord = self.verify_token_and_get_user(id_token)
+        self._auth_service.revoke_refresh_tokens(user.uid)
+
+    def verify_token_and_get_user(self, id_token: str):
+        # TODO this is an unfortunate hack while I wait for this issue to be resolved
+        # https://github.com/firebase/firebase-admin-python/issues/624
+        # https://github.com/firebase/firebase-admin-python/issues/625
+        time.sleep(3)
+        try:
+            jwt: dict = self._auth_service.verify_id_token(id_token, check_revoked=True)
+            email: str = jwt["email"]
+            user: firebase_auth.UserRecord = self._auth_service.get_user_by_email(email)
+            return user
+        except (firebase_auth.ExpiredIdTokenError, firebase_auth.RevokedIdTokenError):
+            raise AuthenticationError
 
 
 def generate_strong_password() -> str:
