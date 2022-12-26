@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 import src.view.models as view_models
-from src.logic import holiday_engine
+from src.logic.services import holiday_service
 
 holiday_router = APIRouter(
     prefix="/holidays",
@@ -16,10 +16,10 @@ holiday_router = APIRouter(
 )
 def is_it_a_holiday(payload: view_models.HolidayBasePayload):
     return view_models.IsHolidayResponse(
-        is_holiday=holiday_engine.is_holiday(
+        is_holiday=holiday_service.is_holiday(
             payload.country_abbreviation, payload.date
         ),
-        holiday_name=holiday_engine.get_holiday_name(
+        holiday_name=holiday_service.get_holiday_name(
             payload.country_abbreviation, payload.date
         ),
     )
@@ -35,7 +35,7 @@ def supported_countries():
             name=country.name,
             flag=country.flag,
         )
-        for country in holiday_engine.get_supported_countries()
+        for country in holiday_service.get_supported_countries()
     ]
 
 
@@ -45,7 +45,7 @@ def supported_countries():
     responses={501: {"model": view_models.NotImplementedResponse}},
 )
 def upcoming_holidays(payload: view_models.UpcomingHolidaysPayload):
-    upcoming_holiday_results = holiday_engine.get_upcoming_holidays(
+    upcoming_holiday_results = holiday_service.get_upcoming_holidays(
         payload.country_abbreviation,
         payload.start_date,
         payload.end_date,

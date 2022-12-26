@@ -7,7 +7,7 @@ import pycountry
 from fastapi import HTTPException
 from pydantic import BaseModel, EmailStr, Field, root_validator
 
-from src.logic import holiday_engine
+from src.logic.services import holiday_service
 from src.logic.services.account_management import generate_strong_password
 
 
@@ -18,7 +18,7 @@ def _convert_to_camel_case(string: str) -> str:
 EXAMPLE_EMAIL = f"ben+{str(uuid.uuid4())}@nathanson.dev"
 EXAMPLE_PASSWORD = generate_strong_password()
 SUPPORTED_COUNTRY_ABBREVIATIONS: list[str] = [
-    c.abbreviation for c in holiday_engine.get_supported_countries()
+    c.abbreviation for c in holiday_service.get_supported_countries()
 ]
 
 

@@ -31,7 +31,7 @@ class Country:
         return Country(iso_country.alpha_2, iso_country.name, iso_country.flag)
 
 
-class HolidayEngine:
+class HolidayService:
     def __init__(self):
         self._country_holidays_cache: dict[str, holidays.HolidayBase] = dict()
         self._cached_supported_countries: list[str] = list(
