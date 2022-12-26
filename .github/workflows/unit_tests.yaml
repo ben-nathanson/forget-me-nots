@@ -21,9 +21,7 @@ jobs:
         run: |
           pip install pytest-cov
           pip install pytest-xdist
-          python3 -m pytest -n auto --cov=./ --cov-report=xml
-      - name: Upload coverage to codecov.io
-        run: bash <(curl -s https://codecov.io/bash)
-        if: always()
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          python3 -m pytest -n auto --cov=./ --cov-report=xml    
+      - uses: codecov/codecov-action@v3
+
+
