@@ -1,7 +1,7 @@
 import datetime as dt
 import json
 import unittest
-from test.logic.test_data import US_INDEPENDENCE_DAY
+from test.test_data import US_INDEPENDENCE_DAY
 
 from fastapi.testclient import TestClient
 from requests import Response  # type: ignore

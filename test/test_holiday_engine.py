@@ -1,6 +1,6 @@
 import datetime as dt
 import unittest
-from test.logic.test_data import NEW_YEARS_DAY, US_INDEPENDENCE_DAY
+from test.test_data import NEW_YEARS_DAY, US_INDEPENDENCE_DAY
 
 from src.logic import HolidayEngine, holiday_engine
 
